@@ -1,0 +1,99 @@
+openapi: 3.0.3
+
+info:
+  title: SakataKintoki
+  version: 0.0.1
+  description:  SakataKintoki API
+
+servers:
+  - url: localhost:3050
+
+paths:
+  '/api/ping':
+    get:
+      summary: ping
+      operationId: getPing
+      responses:
+        '200':
+          description: サンプル
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PingRes"
+
+  '/api/login':
+    post:
+      summary: ログイン
+      operationId: postLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserSimple"
+      responses:
+        '200':
+          description: ログインに成功しました
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserWithoutPass"
+
+  '/api/logout':
+    post:
+      summary: ログアウト
+      operationId: postLogout
+      responses:
+        '200':
+          description: ログアウトに成功しました
+
+  '/api/user/me':
+    get:
+      tags:
+        - user
+      summary: 自分のユーザー情報を取得
+      operationId: getUserMe
+      responses:
+        '200':
+          description: アカウント情報
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserWithoutPass"
+
+components:
+  schemas:
+    PingRes:
+      type: object
+      properties:
+        msg:
+          type: string
+          example: pong
+      required:
+        - msg
+
+    UserSimple:
+      type: object
+      properties:
+        userName:
+          type: string
+          example: testUserName
+        password:
+          type: string
+          example: "********"
+      required:
+        - userName
+        - password
+
+    UserWithoutPass:
+      type: object
+      properties:
+        userId:
+          type: string
+          format: uuid
+        userName:
+          type: string
+          example: testUserName
+      required:
+        - userId
+        - userName
