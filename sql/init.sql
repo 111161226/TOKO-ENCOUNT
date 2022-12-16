@@ -22,19 +22,11 @@ CREATE TABLE `user_deletes` (
 DROP TABLE IF EXISTS `chats`;
 CREATE TABLE `chats` (
   `chat_id` VARCHAR(37) NOT NULL,
-  `room_id` VARCHAR(37) NOT NULL, -- 全体チャットは0?
+  `destination_user_id` VARCHAR(37) NOT NULL, -- 全体チャットは0
   `post` VARCHAR(100) NOT NULL,
-  `postuser_id`  VARCHAR(37) NOT NULL,
+  `post_user_id`  VARCHAR(37) NOT NULL,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`chat_id`),
-);
-
--- db for room data
-DROP TABLE IF EXISTS `room_data`;
-CREATE TABLE `room_data` (
-  `room_id` VARCHAR(37) NOT NULL,
-  `user_id` VARCHAR(37) NOT NULL,
-  PRIMARY KEY (`room_id`, `user_id`),
 );
 
 -- db for session info
