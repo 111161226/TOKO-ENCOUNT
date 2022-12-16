@@ -9,8 +9,8 @@ type ChatSimple struct{
 
 //struct for return posted talk to openchat
 type Chat struct{
-	Post       string `json:"post" db:"p_post"`
-	ChatId     string `json:"chatId" db:"pchat_id"`
+	Post       string `json:"post" db:"post"`
+	ChatId     string `json:"chatId" db:"chat_id"`
 	UserId     string `json:"userId" db:"postuser_id"`
 	UserName   string `json:"userName"`
 	CreatedAt time.Time `json:"createdAt" db:"created_at"`
