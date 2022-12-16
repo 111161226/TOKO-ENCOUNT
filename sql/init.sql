@@ -33,7 +33,7 @@ DROP TABLE IF EXISTS `chat_ownerships`;
 CREATE TABLE `chat_ownerships` (
   `chat_id` VARCHAR(37) NOT NULL,
   `user_id` VARCHAR(37) NOT NULL,
-  PRIMARY KEY (`chat_id`),
+  PRIMARY KEY (`chat_id`, `user_id`),
 );
 
 -- db for session info
