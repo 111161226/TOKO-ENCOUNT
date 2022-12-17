@@ -35,6 +35,21 @@ paths:
         '200':
           description: ログアウトに成功しました
 
+  '/api/ws':
+    get:
+      summary: WebSocket通知ストリームに接続
+      operationId: getWs
+      description: |-
+        新着メッセージ通知の形式
+
+        `message`には、Message構造体が入る
+        ```json
+        {"type": "NEW_MESSAGE", "body": { roomId: "hoge", message: {...} }}
+        ```
+      responses:
+        '101':
+          description: Switching Protocols
+
   '/api/user':
     post:
       tags:
@@ -187,6 +202,35 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageList"
+    post:
+      tags:
+        - chat
+      summary: cidにメッセージを送信
+      operationId: postChat
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: チャットID(全体チャットは0)
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                post:
+                  type: string
+      responses:
+        '200':
+          description: メッセージ送信に成功しました
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
 
 components:
   schemas:
