@@ -1,26 +1,14 @@
 openapi: 3.0.3
 
 info:
-  title: SakataKintoki
+  title: TOKO-ENCOUNT
   version: 0.0.1
-  description:  SakataKintoki API
+  description:  TOKO-ENCOUNT API
 
 servers:
   - url: localhost:3050
 
 paths:
-  '/api/ping':
-    get:
-      summary: ping
-      operationId: getPing
-      responses:
-        '200':
-          description: サンプル
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PingRes"
-
   '/api/login':
     post:
       summary: ログイン
@@ -47,6 +35,81 @@ paths:
         '200':
           description: ログアウトに成功しました
 
+  '/api/ws':
+    get:
+      summary: WebSocket通知ストリームに接続
+      operationId: getWs
+      description: |-
+        新着メッセージ通知の形式
+
+        `message`には、Message構造体が入る
+        ```json
+        {"type": "NEW_MESSAGE", "body": { roomId: "hoge", message: {...} }}
+        ```
+      responses:
+        '101':
+          description: Switching Protocols
+
+  '/api/user':
+    post:
+      tags:
+        - user
+      summary: アカウント作成
+      operationId: postUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        '200':
+          description: アカウント作成に成功しました
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserWithoutPass"
+    get:
+      tags:
+        - user
+      summary: ユーザー検索
+      operationId: getUsers
+      parameters:
+        - name: limit
+          in: query
+          description: 取得するユーザーの最大数
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          description: 何件目のユーザーから取得するか
+          schema:
+            type: integer
+            default: 0
+        - name: name
+          in: query
+          description: ユーザーの名前で検索
+          schema:
+            type: string
+        - name: gender
+          in: query
+          description: ユーザーの性別で検索
+          schema:
+            type: string
+        - name: prefect
+          in: query
+          description: ユーザーの都道府県で検索
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 取得できたユーザー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserList"
+
   '/api/user/me':
     get:
       tags:
@@ -60,17 +123,137 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserWithoutPass"
+    patch:
+      tags:
+        - user
+      summary: プロフィール編集
+      operationId: patchUserMe
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        '200':
+          description: プロフィール編集に成功しました
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserWithoutPass"
+
+  '/api/chat':
+    get:
+      tags:
+        - chat
+      summary: 参加中のチャット一覧を表示
+      operationId: getChat
+      parameters:
+        - name: limit
+          in: query
+          description: 取得するチャットの最大数
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          description: 何件目のチャットから取得するか
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: チャット情報
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatList"
+
+  /api/chat/{cid}:
+    get:
+      tags:
+        - chat
+      summary: cidのチャット内のメッセージを取得
+      operationId: getChatMessages
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: チャットID(全体チャットは0)
+          schema:
+            type: string
+            format: uuid
+        - name: limit
+          in: query
+          description: 取得するメッセージの最大数
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          description: 何件目のメッセージから取得するか
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: メッセージ情報
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageList"
+    post:
+      tags:
+        - chat
+      summary: cidにメッセージを送信
+      operationId: postChat
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: チャットID(全体チャットは0)
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                post:
+                  type: string
+      responses:
+        '200':
+          description: メッセージ送信に成功しました
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
 
 components:
   schemas:
-    PingRes:
+    User:
       type: object
       properties:
-        msg:
+        userName:
           type: string
-          example: pong
+          example: testUserName
+        password:
+          type: string
+          example: "********"
+        prefect:
+          type: string
+          example: 東京都
+        gender:
+          type: string
+          example: male
       required:
-        - msg
+        - userName
+        - password
+        - prefect
+        - gender
 
     UserSimple:
       type: object
@@ -94,6 +277,92 @@ components:
         userName:
           type: string
           example: testUserName
+        prefect:
+          type: string
+          example: 東京都
+        gender:
+          type: string
+          example: male
       required:
         - userId
         - userName
+        - prefect
+        - gender
+
+    UserList:
+      type: object
+      properties:
+        hasNext:
+          type: boolean
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserWithoutPass"
+      required:
+        - hasNext
+        - users
+
+    Message:
+      type: object
+      properties:
+        chatId:
+          type: string
+          format: uuid
+        post:
+          type: string
+          example: hello
+        postUserId:
+          type: string
+          format: uuid
+        userName:
+          type: string
+          example: testUserName
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - chatId
+        - post
+        - postUserId
+        - userName
+        - createdAt
+
+    MessageList:
+      type: object
+      properties:
+        hasNext:
+          type: boolean
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/Message"
+      required:
+        - hasNext
+        - messages
+
+    ChatData:
+      type: object
+      properties:
+        name:
+          type: string
+        latestMessage:
+          $ref: "#/components/schemas/Message"
+        newMessageCount:
+          type: integer
+      required:
+        - name
+        - latestMessage
+        - newMessageCount
+
+    ChatList:
+      type: object
+      properties:
+        hasNext:
+          type: boolean
+        chats:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatData"
+      required:
+        - hasNext
+        - chats
