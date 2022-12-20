@@ -35,6 +35,9 @@ func main() {
 	api := e.Group("/api")
 	{
 		api.GET("/ping", h.Ping)
+		api.GET("/chat/:cid", h.NotImpl)
+		api.POST("/chat/:cid", h.NotImpl)
+		api.POST("/chat", h.NotImpl)
 	}
 
 	e.Logger.Fatal(e.Start(":80"))
