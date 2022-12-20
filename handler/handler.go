@@ -2,18 +2,27 @@ package handler
 
 import (
 	"net/http"
+	"github.com/cs-sysimpl/SakataKintoki/infra"
+	"github.com/cs-sysimpl/SakataKintoki/db/repository"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 )
 
 type Handler struct {
-	db *sqlx.DB
+	ui repository.UserRepository
+	ci repository.ChatRepository
+	si repository.SessionRepository
 }
 
 func NewHandler(db *sqlx.DB) *Handler {
+	ui := infra.NewUserInfra(db)
+	ci := infra.NewChatInfra(db)
+	si := infra.NewSessionInfra(db)
 	return &Handler{
-		db: db,
+		ui: ui,
+		ci: ci,
+		si: si,
 	}
 }
 

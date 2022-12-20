@@ -1,7 +1,7 @@
 package model
 
 //struct for creating account
-type UserCreate struct {
+type User struct {
 	UserName string `json:"userName" db:"user_name" validate:"userName"`
 	Password string `json:"password" db:"password" validate:"password"`
 	Prefect  string `json:"prefect" db:"prefect" validate:"prefect"`
@@ -9,7 +9,7 @@ type UserCreate struct {
 }
 
 //struct for login
-type UserLogin struct {
+type UserSimple struct {
 	UserName string `json:"userName" db:"user_name" validate:"userName"`
 	Password string `json:"password" db:"password" validate:"password"`
 }
@@ -21,15 +21,6 @@ type UserUpdate struct {
 	NewPassword string `json:"newPassword" validate:"password"`
 	NeWPrefect  string `json:"newPrefect" validate:"prefect"`
 	NeWGender   string `json:"newGender" validate:"gender"`
-}
-
-//struct for confirming user info to update
-type User struct {
-	UserId   string `json:"userId" db:"user_id"`
-	UserName string `json:"userName" db:"user_name" validate:"userName"`
-	Password string `json:"password" db:"password" validate:"password"`
-	Prefect  string `json:"prefect" db:"prefect" validate:"prefect"`
-	Gender   string `json:"gender" db:"gender" validate:"gender"`
 }
 
 //struct for return value 
