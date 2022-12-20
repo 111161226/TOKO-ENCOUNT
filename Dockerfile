@@ -10,9 +10,14 @@ RUN npm run gen-api
 RUN npm run build
 
 FROM golang:1.17-alpine AS server-build
-RUN apk add --update --no-cache git curl make
+RUN apk add --update --no-cache git
 WORKDIR /go/src/github.com/cs-sysimpl/SakataKintoki
 COPY ./go.* ./
+COPY docs/swagger.yaml /docs/swagger.yaml
+COPY docs/swagger-ui-diff.patch /docs/swagger-ui-diff.patch
+RUN git clone --depth 1 https://github.com/swagger-api/swagger-ui /docs/swagger-ui &&\
+  cd /docs/swagger-ui &&\
+  git apply /docs/swagger-ui-diff.patch
 RUN go mod download
 COPY . .
 RUN go build
