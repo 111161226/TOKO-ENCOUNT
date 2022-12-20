@@ -2,8 +2,9 @@ package handler
 
 import (
 	"net/http"
-	"github.com/cs-sysimpl/SakataKintoki/infra"
+
 	"github.com/cs-sysimpl/SakataKintoki/db/repository"
+	"github.com/cs-sysimpl/SakataKintoki/infra"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
@@ -32,7 +33,7 @@ func (h *Handler) NotImpl(c echo.Context) error {
 
 func (h *Handler) Ping(c echo.Context) error {
 	type res struct {
-		msg string
+		Msg string `json:"msg"`
 	}
-	return c.JSON(http.StatusOK, &res{msg: "pong"})
+	return c.JSON(http.StatusOK, &res{Msg: "pong"})
 }

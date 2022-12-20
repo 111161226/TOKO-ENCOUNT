@@ -27,6 +27,9 @@ func main() {
 		HTML5: true,
 	}))
 
+	e.File("/api/swagger.yaml", "./docs/swagger.yaml")
+	e.Static("/api", "./docs/swagger-ui/dist")
+
 	e.POST("/api/login", h.NotImpl)
 
 	api := e.Group("/api")

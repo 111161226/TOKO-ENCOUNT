@@ -6,7 +6,7 @@ info:
   description:  TOKO-ENCOUNT API
 
 servers:
-  - url: localhost:3050
+  - url: http://localhost:3050
 
 paths:
   '/api/login':

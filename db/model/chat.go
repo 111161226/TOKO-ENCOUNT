@@ -9,28 +9,28 @@ type MessageSimple struct {
 
 //struct for message
 type Message struct {
-	Post              string    `json:"post" db:"post"`
-	ChatId            string    `json:"chatId" db:"chat_id"`
-	UserId            string    `json:"userId" db:"post_user_id"`
-	UserName          string    `json:"userName" db:"user_name"`
-	CreatedAt         time.Time `json:"createdAt" db:"created_at"`
+	Post      string    `json:"post" db:"post"`
+	ChatId    string    `json:"chatId" db:"chat_id"`
+	UserId    string    `json:"userId" db:"post_user_id"`
+	UserName  string    `json:"userName" db:"user_name"`
+	CreatedAt time.Time `json:"createdAt" db:"created_at"`
 }
 
 //struct for messages
 type MessageList struct {
-	HasNext bool     `json:"hasNext"`
-	Messages   *[]*Message `json:"messages"`
+	HasNext  bool        `json:"hasNext"`
+	Messages *[]*Message `json:"messages"`
 }
 
 //struct for return posted talk to chat
 type ChatData struct {
-	Name 			  string    `json:"name"`
-	LatestMessage     Message   `json:"latestMessage"`
-	NewMessageCount   int       `json:"newMessageCount"`
+	Name            string  `json:"name"`
+	LatestMessage   Message `json:"latestMessage"`
+	NewMessageCount int     `json:"newMessageCount"`
 }
 
 //struct for private chat talks
 type ChatList struct {
-	HasNext bool     `json:"hasNext"`
+	HasNext bool         `json:"hasNext"`
 	Chats   *[]*ChatData `json:"chats"`
 }
