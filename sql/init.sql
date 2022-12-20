@@ -30,7 +30,7 @@ CREATE TABLE `chats` (
 );
 
 -- db for room data
-DROP TABLE IF EXISTS `room_data`;
+DROP TABLE IF EXISTS `room_datas`;
 CREATE TABLE `room_data` (
   `room_id` VARCHAR(37) NOT NULL,
   `user_id` VARCHAR(37) NOT NULL,
