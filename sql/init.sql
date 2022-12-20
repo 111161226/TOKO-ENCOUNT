@@ -29,6 +29,16 @@ CREATE TABLE `chats` (
   PRIMARY KEY (`chat_id`),
 );
 
+-- db for room data
+DROP TABLE IF EXISTS `room_data`;
+CREATE TABLE `room_data` (
+  `room_id` VARCHAR(37) NOT NULL,
+  `user_id` VARCHAR(37) NOT NULL,
+  `latest_access` NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `not_read` BIGINT(100) NOT NULL DEFAULT 0
+  PRIMARY KEY (`room_id`, `user_id`),
+);
+
 -- db for session info
 DROP TABLE IF EXISTS `sessions`;
 CREATE TABLE `sessions` (
