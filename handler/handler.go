@@ -2,8 +2,9 @@ package handler
 
 import (
 	"net/http"
-	"github.com/cs-sysimpl/SakataKintoki/infra"
+
 	"github.com/cs-sysimpl/SakataKintoki/db/repository"
+	"github.com/cs-sysimpl/SakataKintoki/infra"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
