@@ -43,32 +43,7 @@ func (ci *chatInfra) PostChat(chatId string, destinationId string, message *mode
 }
 
 func (ci *chatInfra) GetMessages(chatId string, limit int, offset int) (*model.MessageList, error) {
-	messages := []*model.Message{}
-	//fetch message datas from db 
-	err := ci.db.Select(
-		&messages,
-		"SELECT post, chat_id, post_user_id, user_name, created_at FROM chats INNER JOIN users ON post_user_id = user_id WHERE chat_id = ?  ORDER BY `created_at` DESC LIMIT ? OFFSET ?",
-		chatId,
-		limit,
-		offset,
-	)
-	if err != nil {
-		return nil, err
-	}
-	//variable to check page is one
-	count := 0
-	err = ci.db.Get(
-		&count,
-		"SELECT COUNT(*) FROM `chats` WHERE chat_id = ?",
-		chatId,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &model.MessageList{
-		HasNext: count > len(messages),
-		Messages: &messages,
-	}, nil
+	return nil, nil
 }
 
 func (ci *chatInfra) CreateChat(destinationId string, post_user_id string) (*model.Message, error) {
