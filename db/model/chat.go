@@ -26,7 +26,7 @@ type MessageList struct {
 type ChatData struct {
 	Name 			  string    `json:"name"`
 	LatestMessage     Message   `json:"latestMessage"`
-	NewMessage        int       `json:"newMessage"`
+	NewMessageCount   int       `json:"newMessageCount"`
 }
 
 //struct for private chat talks
