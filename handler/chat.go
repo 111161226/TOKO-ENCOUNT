@@ -2,7 +2,6 @@ package handler
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/cs-sysimpl/SakataKintoki/db/model"
 	"github.com/labstack/echo/v4"

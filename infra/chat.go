@@ -66,6 +66,23 @@ func (ci *chatInfra) CreateChat(destinationId string, post_user_id string) (*mod
 		return nil, err
 	}
 	chatId := ch.String()
+	//add room_data to db
+	_, err = ci.db.Exec(
+		"INSERT INTO `room_datas` (`room_id`, `user_id`) VALUES (?, ?)",
+		chatId,
+		post_user_id,
+	)
+	if err != nil {
+		return nil, err
+	}
+	_, err = ci.db.Exec(
+		"INSERT INTO `room_datas` (`room_id`, `user_id`) VALUES (?, ?)",
+		chatId,
+		destinationId,
+	)
+	if err != nil {
+		return nil, err
+	}
 	//post first message
 	return ci.PostChat(chatId, destinationId , &message, post_user_id) 
 }
