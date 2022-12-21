@@ -29,7 +29,25 @@ export const sidebarRoutes: IRouteRecordRaw[] = [
     path: '',
     name: 'Home',
     component: () => import('@/pages/Home/index.vue'),
-    meta: { title: 'トップページ' }
+    meta: { title: 'Home' }
+  },
+  {
+    path: '/timeline',
+    name: 'Timeline',
+    component: () => import('@/pages/Timeline/index.vue'),
+    meta: { title: 'Timeline' }
+  },
+  {
+    path: '/search',
+    name: 'Search',
+    component: () => import('@/pages/Search/index.vue'),
+    meta: { title: 'Search' }
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: () => import('@/pages/Profile/index.vue'),
+    meta: { title: 'Profile' }
   }
 ]
 
