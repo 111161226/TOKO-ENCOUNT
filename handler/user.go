@@ -25,13 +25,3 @@ func (h *Handler) Login(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, &user)
 }
-
-func (h *Handler) Test(c echo.Context) error {
-	var user model.UserWithoutPass
-	user.UserId = "a"
-	user.UserName = "b"
-	user.Prefect = "c"
-	user.Gender = "d"
-
-	return c.JSON(http.StatusOK, &user)
-}
