@@ -343,6 +343,8 @@ components:
     ChatData:
       type: object
       properties:
+        roomId:
+          type: string
         name:
           type: string
         latestMessage:
@@ -350,6 +352,7 @@ components:
         newMessageCount:
           type: integer
       required:
+        - roomId
         - name
         - latestMessage
         - newMessageCount
