@@ -55,9 +55,9 @@ const me = useMe()
   font-size: larger;
   font-weight: 500;
   color: black;
-  transition: opacity 0.2s ease-in-out;
+  transition: color 0.2s;
   &:hover {
-    opacity: 0.6;
+    color: $color-secondary;
   }
 }
 .active-link {
