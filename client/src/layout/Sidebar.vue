@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { ElButton } from 'element-plus'
 import { sidebarRoutes } from '@/router'
 import { useMe } from '@/store/me'
 
@@ -21,7 +22,7 @@ const me = useMe()
     </div>
     <div class="logout">
       <router-link :to="{ name: 'Login' }" class="link">
-        <button class="button" :on-click="me.logout">Logout</button>
+        <el-button class="button" @click="me.logout">Logout</el-button>
       </router-link>
     </div>
   </div>
@@ -68,15 +69,7 @@ const me = useMe()
 }
 .button {
   background-color: $color-primary;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: medium;
-  padding: 0.5rem 1rem;
   color: white;
-  transition: opacity 0.2s ease-in-out;
-  cursor: pointer;
-  &:hover {
-    opacity: 0.8;
-  }
+  border-radius: 0.5rem;
 }
 </style>
