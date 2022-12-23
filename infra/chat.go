@@ -87,6 +87,32 @@ func (ci *chatInfra) CreateChat(destinationId string, post_user_id string) (*mod
 	return ci.PostChat(chatId, destinationId , &message, post_user_id) 
 }
 
+func (ci *chatInfra) GetChatMessages(chatId string, limit int, offset int) (*model.MessageList, error) {
+	mess := []*model.Message{}
+	err := ci.db.Select(
+		&mess,
+		"SELECT post, chat_id, post_user_id, user_name, created_at FROM chats INNER JOIN users ON post_user_id = user_id WHERE chat_id = ? AND post_user_id = ? ORDER BY `created_at` DESC",
+		chatId,
+		limit,
+		offset,
+	)
+	if err != nil {
+		return nil, err
+	}
+	count := 0
+	err = ci.db.Get(
+		&count,
+		"SELECT COUNT(*) FROM `chats` WHERE `chat_id` = ?",
+		chatId,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &model.MessageList{
+		Messages: &mess,
+		HasNext: count > len(mess),
+	}, nil
+}
 
 func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.ChatList, error) {
 	return nil, nil

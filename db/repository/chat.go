@@ -7,4 +7,5 @@ type ChatRepository interface {
 	GetMessages(chatId string, limit int, offset int) (*model.MessageList, error)
 	CreateChat(destinationId string, post_user_id string) (*model.Message, error)
 	GetChatList(userId string, limit int, offset int) (*model.ChatList, error)
+	GetChatMessages(chatId string, limit int, offset int) (*model.MessageList, error)
 }
