@@ -34,19 +34,19 @@ export const sidebarRoutes: IRouteRecordRaw[] = [
   {
     path: '/timeline',
     name: 'Timeline',
-    component: () => import('@/pages/Timeline/index.vue'),
+    component: {}, // TODO
     meta: { title: 'Timeline' }
   },
   {
     path: '/search',
     name: 'Search',
-    component: () => import('@/pages/Search/index.vue'),
+    component: {}, // TODO
     meta: { title: 'Search' }
   },
   {
     path: '/profile',
     name: 'Profile',
-    component: () => import('@/pages/Profile/index.vue'),
+    component: {}, // TODO
     meta: { title: 'Profile' }
   }
 ]
