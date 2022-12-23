@@ -24,6 +24,7 @@ type MessageList struct {
 
 //struct for return posted talk to chat
 type ChatData struct {
+	RoomId          string  `json:"roomId"`
 	Name            string  `json:"name"`
 	LatestMessage   Message `json:"latestMessage"`
 	NewMessageCount int     `json:"newMessageCount"`

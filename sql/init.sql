@@ -22,6 +22,7 @@ CREATE TABLE `user_deletes` (
 DROP TABLE IF EXISTS `chats`;
 CREATE TABLE `chats` (
   `chat_id` VARCHAR(37) NOT NULL,
+  `room_id` VARCHAR(37) NOT NULL, -- 全体チャットは0
   `destination_user_id` VARCHAR(37) NOT NULL, -- 全体チャットは0
   `post` VARCHAR(100) NOT NULL,
   `post_user_id`  VARCHAR(37) NOT NULL,
@@ -34,7 +35,7 @@ DROP TABLE IF EXISTS `room_datas`;
 CREATE TABLE `room_data` (
   `room_id` VARCHAR(37) NOT NULL,
   `user_id` VARCHAR(37) NOT NULL,
-  `latest_access` NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `latest_access` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `not_read` BIGINT(100) NOT NULL DEFAULT 0
   PRIMARY KEY (`room_id`, `user_id`),
 );
