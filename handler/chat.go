@@ -12,7 +12,7 @@ func (h *Handler) ChatPost(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	cid := c.Param("cid")
+	rid := c.Param("rid")
 	did := c.QueryParam("did")
 	post := &model.MessageSimple{}
 	err = validatedBind(c, post)
@@ -20,7 +20,7 @@ func (h *Handler) ChatPost(c echo.Context) error {
 		return err
 	}
 
-	postedMessage, err := h.ci.PostChat(cid, did, post, sess.UserId)
+	postedMessage, err := h.ci.PostChat(rid, did, post, sess.UserId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -42,8 +42,8 @@ func (h *Handler) CreateChat(c echo.Context) error {
 	return c.JSON(http.StatusOK, message)
 }
 
-func (h *Handler) GetChatMessages(c echo.Context) error {
-	cid := c.Param("cid")
+func (h *Handler) GetMessages(c echo.Context) error {
+	rid := c.Param("rid")
 	l := c.QueryParam("limit")
 	if l == "" {
 		l = "20"
@@ -61,7 +61,7 @@ func (h *Handler) GetChatMessages(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	message, err := h.ci.GetChatMessages(cid, limit, offset)
+	message, err := h.ci.GetMessages(rid, limit, offset)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

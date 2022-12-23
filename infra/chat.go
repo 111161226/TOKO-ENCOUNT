@@ -17,11 +17,17 @@ func NewChatInfra(db *sqlx.DB) repository.ChatRepository {
 	return &chatInfra{db: db}
 }
 
-func (ci *chatInfra) PostChat(chatId string, destinationId string, message *model.MessageSimple, post_user_id string) (*model.Message, error) {
+func (ci *chatInfra) PostChat(roomId string, destinationId string, message *model.MessageSimple, post_user_id string) (*model.Message, error) {
+	ch, err := uuid.NewRandom()
+	if err != nil {
+		return nil, err
+	}
+	chatId := ch.String()
 	//insert message into chats db
-	_, err := ci.db.Exec(
-		"INSERT INTO `chats` (`chat_id`, `destination_user_id`, `post`, `post_user_id`) VALUES (?, ?, ?, ?)",
+	_, err = ci.db.Exec(
+		"INSERT INTO `chats` (`chat_id`, `room_id`, `destination_user_id`, `post`, `post_user_id`) VALUES (?, ?, ?, ?, ?)",
 		chatId,
+		roomId,
 		destinationId,
 		message.Post,
 		post_user_id,
@@ -33,8 +39,8 @@ func (ci *chatInfra) PostChat(chatId string, destinationId string, message *mode
 	mess := model.Message{}
 	err = ci.db.Get(
 		&mess,
-		"SELECT post, chat_id, post_user_id, user_name, created_at FROM chats INNER JOIN users ON post_user_id = user_id WHERE chat_id = ? AND post_user_id = ? ORDER BY `created_at` DESC",
-		chatId,
+		"SELECT post, room_id, post_user_id, user_name, created_at FROM chats INNER JOIN users ON post_user_id = user_id WHERE room_id = ? AND post_user_id = ? ORDER BY `created_at` DESC",
+		roomId,
 		post_user_id,
 	)
 
@@ -42,8 +48,31 @@ func (ci *chatInfra) PostChat(chatId string, destinationId string, message *mode
 	return &mess, nil
 }
 
-func (ci *chatInfra) GetMessages(chatId string, limit int, offset int) (*model.MessageList, error) {
-	return nil, nil
+func (ci *chatInfra) GetMessages(roomId string, limit int, offset int) (*model.MessageList, error) {
+	mess := []*model.Message{}
+	err := ci.db.Select(
+		&mess,
+		"SELECT post, room_id, post_user_id, user_name, created_at FROM chats INNER JOIN users ON post_user_id = user_id WHERE room_id = ? AND post_user_id = ? ORDER BY `created_at` DESC",
+		roomId,
+		limit,
+		offset,
+	)
+	if err != nil {
+		return nil, err
+	}
+	count := 0
+	err = ci.db.Get(
+		&count,
+		"SELECT COUNT(*) FROM `chats` WHERE `room_id` = ?",
+		roomId,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &model.MessageList{
+		Messages: &mess,
+		HasNext: count > len(mess),
+	}, nil
 }
 
 func (ci *chatInfra) CreateChat(destinationId string, post_user_id string) (*model.Message, error) {
@@ -65,11 +94,11 @@ func (ci *chatInfra) CreateChat(destinationId string, post_user_id string) (*mod
 	if err != nil {
 		return nil, err
 	}
-	chatId := ch.String()
+	roomId := ch.String()
 	//add room_data to db
 	_, err = ci.db.Exec(
 		"INSERT INTO `room_datas` (`room_id`, `user_id`) VALUES (?, ?)",
-		chatId,
+		roomId,
 		post_user_id,
 	)
 	if err != nil {
@@ -77,41 +106,14 @@ func (ci *chatInfra) CreateChat(destinationId string, post_user_id string) (*mod
 	}
 	_, err = ci.db.Exec(
 		"INSERT INTO `room_datas` (`room_id`, `user_id`) VALUES (?, ?)",
-		chatId,
+		roomId,
 		destinationId,
 	)
 	if err != nil {
 		return nil, err
 	}
 	//post first message
-	return ci.PostChat(chatId, destinationId , &message, post_user_id) 
-}
-
-func (ci *chatInfra) GetChatMessages(chatId string, limit int, offset int) (*model.MessageList, error) {
-	mess := []*model.Message{}
-	err := ci.db.Select(
-		&mess,
-		"SELECT post, chat_id, post_user_id, user_name, created_at FROM chats INNER JOIN users ON post_user_id = user_id WHERE chat_id = ? AND post_user_id = ? ORDER BY `created_at` DESC",
-		chatId,
-		limit,
-		offset,
-	)
-	if err != nil {
-		return nil, err
-	}
-	count := 0
-	err = ci.db.Get(
-		&count,
-		"SELECT COUNT(*) FROM `chats` WHERE `chat_id` = ?",
-		chatId,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &model.MessageList{
-		Messages: &mess,
-		HasNext: count > len(mess),
-	}, nil
+	return ci.PostChat(roomId, destinationId , &message, post_user_id) 
 }
 
 func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.ChatList, error) {
