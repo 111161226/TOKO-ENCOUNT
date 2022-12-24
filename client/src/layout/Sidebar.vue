@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { ElButton } from 'element-plus'
 import { sidebarRoutes } from '@/router'
 import { useMe } from '@/store/me'
 
