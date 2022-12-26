@@ -37,7 +37,7 @@ func main() {
 		api.GET("/ping", h.Ping)
 		api.POST("/chat/:rid", h.ChatPost)
 		api.GET("/chat/:rid", h.GetMessages)
-		api.POST("/chat", h.CreateChat)
+		api.POST("/chat/new", h.CreateChat)
 	}
 
 	e.Logger.Fatal(e.Start(":80"))
