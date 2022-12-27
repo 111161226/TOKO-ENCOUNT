@@ -21,7 +21,37 @@ func (h *Handler) Login(c echo.Context) error {
 	}
 
 	//セッション作成
-	createSessionAndSetCookie(c, h, user.UserId)
+	err = createSessionAndSetCookie(c, h, user.UserId)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, &user)
+}
+
+func (h *Handler) SignUp(c echo.Context) error {
+	//入力取得
+	u := new(model.User)
+	if err := c.Bind(u); err != nil {
+		return err
+	}
+
+	//ユーザ名、パスワード確認
+	if u.UserName == "" || u.Password == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "invalid name or password")
+	}
+
+	//重複チェック
+	_, err := h.ui.CheckUsedUserName(u.UserName)
+	if err != nil {
+		return err
+	}
+
+	//登録
+	user, err := h.ui.CreateUser(u)
+	if err != nil {
+		return err
+	}
 
 	return c.JSON(http.StatusOK, &user)
 }

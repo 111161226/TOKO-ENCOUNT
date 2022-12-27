@@ -31,6 +31,7 @@ func main() {
 	e.Static("/api", "./docs/swagger-ui/dist")
 
 	e.POST("/api/login", h.Login)
+	e.POST("/api/user", h.SignUp)
 
 	api := e.Group("/api")
 	{

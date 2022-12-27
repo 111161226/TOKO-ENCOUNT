@@ -6,6 +6,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"fmt"
+	"crypto/sha256"
+	"encoding/hex"
 )
 
 type userInfra struct {
@@ -14,6 +16,15 @@ type userInfra struct {
 
 func NewUserInfra(db *sqlx.DB) repository.UserRepository {
 	return &userInfra{db: db}
+}
+
+//ハッシュ化関数
+func hash(pw string) string {
+	const salt = "SakataKintoki#"
+	h := sha256.New()
+	h.Write([]byte(salt))
+	h.Write([]byte(pw))
+	return hex.EncodeToString(h.Sum(nil))
 }
 
 func (ui *userInfra) CreateUser(user *model.User) (*model.UserWithoutPass, error) {
@@ -30,7 +41,7 @@ func (ui *userInfra) CreateUser(user *model.User) (*model.UserWithoutPass, error
 		"INSERT INTO users(user_id, user_name, password, prefect, gender) VALUES (?, ?, ?, ? ,?)",
 		userId,
 		user.UserName,
-		user.Password,
+		hash(user.Password),
 		user.Prefect,
 		user.Gender,
 	)
@@ -105,7 +116,7 @@ func (ui *userInfra) CheckRightUser(user *model.UserSimple) (*model.UserWithoutP
 	}
 
 	//パスワード照合
-	if password != user.Password {
+	if password != hash(user.Password) {
 		return nil, fmt.Errorf("err : %s", "Incorrect password")
 	}
 
@@ -123,5 +134,20 @@ func (ui *userInfra) CheckRightUser(user *model.UserSimple) (*model.UserWithoutP
 }
 
 func (ui *userInfra) CheckUsedUserName(userName string) (*model.UserWithoutPass, error) {
+	// userName取得
+	var duplicate int
+	err := ui.db.Get(
+		&duplicate, "SELECT COUNT(*) FROM users WHERE user_name = ?",
+		userName,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	//重複チェック
+	if duplicate > 0 {
+		return nil, fmt.Errorf("err : %s", "Username is already taken")
+	}
+
 	return nil, nil
 }
