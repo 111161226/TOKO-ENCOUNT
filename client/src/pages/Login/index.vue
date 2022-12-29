@@ -60,7 +60,7 @@ const login = async () => {
 
 <template>
   <div class="change-user-name-container">
-    <div class="title">TODO List</div>
+    <div class="title">TOKO ENCOUNT</div>
     <el-form
       ref="formRef"
       :model="inputData"
