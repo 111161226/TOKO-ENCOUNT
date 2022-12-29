@@ -86,7 +86,7 @@ const router = createRouter({
   history: createWebHistory(),
   routes: constantRouts.concat(publicRoutes)
 })
-/*
+
 router.beforeEach(async (to: IRoute, _, next) => {
   const meStore = useMe()
 
@@ -146,5 +146,5 @@ router.beforeEach(async (to: IRoute, _, next) => {
     return
   }
 })
-*/
+
 export default router
