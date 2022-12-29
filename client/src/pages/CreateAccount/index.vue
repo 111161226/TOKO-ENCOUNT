@@ -47,7 +47,7 @@ const confirmCreate = async () => {
     loading.value = true
     await meStore.createMe(inputData)
     ElMessage({
-      message: inputData.gender,
+      message: 'アカウントを作成しました',
       type: 'success'
     })
     router.push({ name: 'Home' })
