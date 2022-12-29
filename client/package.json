@@ -12,6 +12,7 @@
     "mock": "prism mock -p 3050 -d ../docs/swagger.yaml"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^2.0.10",
     "dayjs": "^1.11.6",
     "element-plus": "^2.2.19",
     "pinia": "^2.0.23",
