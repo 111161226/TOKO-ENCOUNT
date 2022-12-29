@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import apis, { Message } from '@/lib/apis'
 import { useMe } from '@/store/me'
-import { onMounted, ref } from 'vue'
+import { onMounted, onUpdated, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 const storeMe = useMe()
@@ -10,6 +10,8 @@ const route = useRoute()
 const myUserName = ref(storeMe.getMe?.userName)
 const otherUserName = ref('')
 const messages = ref<Message[]>()
+const inputMessage = ref('')
+const contentDivRef = ref<HTMLDivElement>()
 
 onMounted(async () => {
   const { data } = await apis.getChatMessages(route.params.id as string)
@@ -22,6 +24,10 @@ onMounted(async () => {
     }
   }
 })
+onUpdated(() => {
+  // scroll to bottom of messages
+  contentDivRef.value?.scrollTo(0, contentDivRef.value.scrollHeight)
+})
 </script>
 
 <template>
@@ -29,7 +35,7 @@ onMounted(async () => {
     <div class="header">
       {{ otherUserName }}
     </div>
-    <div class="content">
+    <div class="content" ref="contentDivRef">
       <div class="message-list">
         <div
           v-for="message in messages"
@@ -43,6 +49,17 @@ onMounted(async () => {
           {{ message.post }}
         </div>
       </div>
+    </div>
+    <div class="input-container">
+      <el-input
+        v-model="inputMessage"
+        type="textarea"
+        :autosize="{ minRows: 1, maxRows: 3 }"
+        resize="none"
+        placeholder="Message"
+        class="input"
+      ></el-input>
+      <el-icon size="1.5rem" class="icon"><Promotion /></el-icon>
     </div>
   </div>
 </template>
@@ -85,5 +102,20 @@ onMounted(async () => {
   background-color: $bgcolor-primary;
   border-radius: 8px;
   border-bottom-left-radius: 0;
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+}
+.input {
+  margin-right: 0.5rem;
+}
+.icon {
+  color: $color-secondary;
+  margin-top: auto;
+  margin-bottom: 0.25rem;
+  cursor: pointer;
 }
 </style>
