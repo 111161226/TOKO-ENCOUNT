@@ -66,7 +66,7 @@ onUpdated(() => {
   position: sticky;
   top: 0;
   font-weight: 600;
-  border-bottom: 3px solid $bgcolor-primary;
+  border-bottom: 2px solid $bgcolor-primary;
   padding: 0.5rem 1rem;
 }
 .content {
