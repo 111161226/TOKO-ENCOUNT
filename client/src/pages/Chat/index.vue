@@ -3,6 +3,7 @@ import apis, { Message } from '@/lib/apis'
 import { useMe } from '@/store/me'
 import { onMounted, onUpdated, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import ChatInput from './components/ChatInput.vue'
 
 const storeMe = useMe()
 const route = useRoute()
@@ -10,7 +11,6 @@ const route = useRoute()
 const myUserName = ref(storeMe.getMe?.userName)
 const otherUserName = ref('')
 const messages = ref<Message[]>()
-const inputMessage = ref('')
 const contentDivRef = ref<HTMLDivElement>()
 
 onMounted(async () => {
@@ -51,14 +51,7 @@ onUpdated(() => {
       </div>
     </div>
     <div class="input-container">
-      <el-input
-        v-model="inputMessage"
-        type="textarea"
-        :autosize="{ minRows: 1, maxRows: 3 }"
-        resize="none"
-        placeholder="Message"
-        class="input"
-      ></el-input>
+      <chat-input class="input" />
       <el-icon size="1.5rem" class="icon"><Promotion /></el-icon>
     </div>
   </div>
