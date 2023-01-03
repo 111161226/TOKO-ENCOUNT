@@ -64,7 +64,7 @@ onUpdated(() => {
 
 .input-container {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   padding: 0.5rem 1rem;
 }
 .input {
@@ -72,8 +72,6 @@ onUpdated(() => {
 }
 .icon {
   color: $color-secondary;
-  margin-top: auto;
-  margin-bottom: 0.25rem;
   cursor: pointer;
 }
 </style>
