@@ -1,20 +1,20 @@
 <script lang="ts" setup>
 import { useMessages } from '@/store/message'
-import { onMounted, ref, computed } from 'vue'
-import { onBeforeRouteLeave, useRoute } from 'vue-router'
+import { onMounted, ref, computed, watch } from 'vue'
+import { useRoute } from 'vue-router'
 
 const messagesStore = useMessages()
 const route = useRoute()
 
 const inputMessage = ref('')
+watch(inputMessage, newMessage => {
+  messagesStore.setMessage(roomId, newMessage)
+})
 
 const roomId = route.params.id as string
 onMounted(() => {
   const storedMessage = computed(() => messagesStore.getMessage(roomId))
   inputMessage.value = storedMessage.value?.message ?? ''
-})
-onBeforeRouteLeave(() => {
-  messagesStore.setMessage(roomId, inputMessage.value)
 })
 </script>
 
