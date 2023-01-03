@@ -1,20 +1,33 @@
 <script lang="ts" setup>
 import apis, { Message } from '@/lib/apis'
 import { useMe } from '@/store/me'
+import { useMessages } from '@/store/message'
 import { onMounted, onUpdated, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import ChatInput from './components/ChatInput.vue'
+import MessageList from './components/MessageList.vue'
 
 const storeMe = useMe()
+const storeMessages = useMessages()
+
 const route = useRoute()
+const roomId = route.params.id as string
 
 const myUserName = ref(storeMe.getMe?.userName)
 const otherUserName = ref('')
 const messages = ref<Message[]>()
 const contentDivRef = ref<HTMLDivElement>()
 
+const onSubmit = async () => {
+  const message = storeMessages.getMessage(roomId)?.message
+  if (message) {
+    await apis.postChat(roomId, { post: message })
+    storeMessages.setMessage(roomId, '')
+  }
+}
+
 onMounted(async () => {
-  const { data } = await apis.getChatMessages(route.params.id as string)
+  const { data } = await apis.getChatMessages(roomId)
   messages.value = data.messages
 
   for (const message of messages.value) {
@@ -40,7 +53,9 @@ onUpdated(() => {
     </div>
     <div class="input-container">
       <chat-input class="input" />
-      <el-icon size="1.5rem" class="icon"><Promotion /></el-icon>
+      <div @click="onSubmit" @keydown.enter="onSubmit">
+        <el-icon size="1.5rem" class="icon"><Promotion /></el-icon>
+      </div>
     </div>
   </div>
 </template>

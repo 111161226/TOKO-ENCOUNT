@@ -12,6 +12,10 @@ watch(inputMessage, newMessage => {
 })
 
 const roomId = route.params.id as string
+messagesStore.$subscribe((_, state) => {
+  const newMessage = state.messages?.find(m => m.roomId === roomId)?.message
+  inputMessage.value = newMessage ?? ''
+})
 onMounted(() => {
   const storedMessage = computed(() => messagesStore.getMessage(roomId))
   inputMessage.value = storedMessage.value?.message ?? ''
