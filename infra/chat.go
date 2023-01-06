@@ -52,7 +52,7 @@ func (ci *chatInfra) GetMessages(roomId string, limit int, offset int) (*model.M
 	mess := []*model.Message{}
 	err := ci.db.Select(
 		&mess,
-		"SELECT post, room_id, post_user_id, user_name, created_at FROM chats INNER JOIN users ON post_user_id = user_id WHERE room_id = ? AND post_user_id = ? ORDER BY `created_at` DESC",
+		"SELECT post, room_id, post_user_id, user_name, created_at FROM chats INNER JOIN users ON post_user_id = user_id WHERE room_id = ? ORDER BY `created_at` DESC LIMIT ? OFFSET ?",
 		roomId,
 		limit,
 		offset,
@@ -97,15 +97,9 @@ func (ci *chatInfra) CreateChat(destinationId string, post_user_id string) (*mod
 	roomId := ch.String()
 	//add room_data to db
 	_, err = ci.db.Exec(
-		"INSERT INTO `room_datas` (`room_id`, `user_id`) VALUES (?, ?)",
+		"INSERT INTO `room_datas` (`room_id`, `user_id`) VALUES (?, ?), (?, ?)",
 		roomId,
 		post_user_id,
-	)
-	if err != nil {
-		return nil, err
-	}
-	_, err = ci.db.Exec(
-		"INSERT INTO `room_datas` (`room_id`, `user_id`) VALUES (?, ?)",
 		roomId,
 		destinationId,
 	)
