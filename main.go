@@ -35,6 +35,8 @@ func main() {
 	api := e.Group("/api")
 	{
 		api.GET("/ping", h.Ping)
+
+		api.GET("/ws", h.GetWebSocket)
 	}
 
 	e.Logger.Fatal(e.Start(":80"))
