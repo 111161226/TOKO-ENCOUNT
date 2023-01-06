@@ -75,7 +75,7 @@ func (ui *userInfra) EditUser(userId string, user *model.UserUpdate) (*model.Use
 	//古いパスワード取得
 	var oldpassword string
 	err := ui.db.Get(
-		&oldpassword, "SELECT `Password` FROM `users` WHERE `user_id` = ?",
+		&oldpassword, "SELECT `password` FROM `users` WHERE `user_id` = ?",
 		userId,
 	)
 	if err != nil {
@@ -83,7 +83,7 @@ func (ui *userInfra) EditUser(userId string, user *model.UserUpdate) (*model.Use
 	}	
 	
 	//パスワード照合
-	if oldpassword != user.Password {
+	if oldpassword != hash(user.Password) {
 		return nil, fmt.Errorf("err : %s", "Incorrect paassword")
 	}
 
@@ -108,7 +108,7 @@ func (ui *userInfra) CheckRightUser(user *model.UserSimple) (*model.UserWithoutP
 	//パスワード取得
 	var password string
 	err := ui.db.Get(
-		&password, "SELECT `Password` FROM `users` WHERE `user_name` = ?",
+		&password, "SELECT `password` FROM `users` WHERE `user_name` = ?",
 		user.UserName,
 	)
 	if err != nil {
@@ -135,19 +135,15 @@ func (ui *userInfra) CheckRightUser(user *model.UserSimple) (*model.UserWithoutP
 
 func (ui *userInfra) CheckUsedUserName(userName string) (*model.UserWithoutPass, error) {
 	// userName取得
-	var duplicate int
+	var user model.UserWithoutPass
 	err := ui.db.Get(
-		&duplicate, "SELECT COUNT(*) FROM `users` WHERE `user_name` = ?",
+		&user, "SELECT `user_id`, `user_name`, `prefect`, `gender` FROM `users` WHERE `user_name` = ?",
 		userName,
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	//重複チェック
-	if duplicate > 0 {
-		return nil, fmt.Errorf("err : %s", "Username is already taken")
-	}
-
-	return nil, nil
+	// 重複している場合はuser!=nil
+	return &user, nil
 }
