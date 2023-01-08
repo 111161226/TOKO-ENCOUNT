@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"github.com/cs-sysimpl/SakataKintoki/db/model"
 	"github.com/labstack/echo/v4"
+	"fmt"
 )
 
 func (h *Handler) ChatPost(c echo.Context) error {
@@ -67,6 +68,17 @@ func (h *Handler) GetMessages(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, message)
+}
+
+func (h *Handler) PickChatByRoomId(roomId string) (*model.ChatUserList, error) {
+	users, err := h.ci.GetChatByRoomId(roomId)
+	if err != nil {
+		return nil, echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	if users == nil {
+		return nil, echo.NewHTTPError(http.StatusNotFound, fmt.Sprintf("no such room `%s`", roomId))
+	}
+	return users, nil
 }
 
 func validatedBind(c echo.Context, i interface{}) error {
