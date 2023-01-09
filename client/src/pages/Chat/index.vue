@@ -2,7 +2,7 @@
 import apis, { Message } from '@/lib/apis'
 import { useMe } from '@/store/me'
 import { useMessages } from '@/store/message'
-import { onMounted, onUpdated, ref } from 'vue'
+import { nextTick, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import ChatInput from './components/ChatInput.vue'
 import MessageList from './components/MessageList.vue'
@@ -23,8 +23,25 @@ const onSubmit = async () => {
   if (message) {
     await apis.postChat(roomId, { post: message })
     storeMessages.setMessage(roomId, '')
+    messages.value?.push({
+      chatId: roomId,
+      post: message,
+      postUserId: storeMe.getMe!.userId!,
+      userName: myUserName.value!,
+      createdAt: ''
+    })
   }
 }
+
+watch(
+  messages,
+  async () => {
+    // scroll to bottom
+    await nextTick()
+    contentDivRef.value?.scrollTo(0, contentDivRef.value.scrollHeight)
+  },
+  { deep: true }
+)
 
 onMounted(async () => {
   const { data } = await apis.getChatMessages(roomId)
@@ -36,10 +53,6 @@ onMounted(async () => {
       break
     }
   }
-})
-onUpdated(() => {
-  // scroll to bottom of messages
-  contentDivRef.value?.scrollTo(0, contentDivRef.value.scrollHeight)
 })
 </script>
 
