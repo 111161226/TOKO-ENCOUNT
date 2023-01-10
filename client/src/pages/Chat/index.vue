@@ -21,15 +21,9 @@ const contentDivRef = ref<HTMLDivElement>()
 const onSubmit = async () => {
   const message = storeMessages.getMessage(roomId)?.message
   if (message) {
-    await apis.postChat(roomId, { post: message })
+    const { data } = await apis.postChat(roomId, { post: message })
     storeMessages.setMessage(roomId, '')
-    messages.value?.push({
-      chatId: roomId,
-      post: message,
-      postUserId: storeMe.getMe!.userId!,
-      userName: myUserName.value!,
-      createdAt: ''
-    })
+    messages.value?.push(data)
   }
 }
 
