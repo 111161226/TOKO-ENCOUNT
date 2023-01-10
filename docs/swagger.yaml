@@ -168,6 +168,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ChatList"
+    post:
+      tags:
+        - chat
+      summary: 新規にプライベートルームを作成
+      operationId: createChat
+      parameters:
+        - name: did
+          in: query
+          required: true
+          description: トーク相手のユーザーID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: メッセージ情報
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
 
   /api/chat/{rid}:
     get:
@@ -212,6 +232,13 @@ paths:
           in: path
           required: true
           description: ルームID(全体チャットは0)
+          schema:
+            type: string
+            format: uuid
+        - name: did
+          in: query
+          required: true
+          description: 送信相手のユーザーID(全体チャットは0)
           schema:
             type: string
             format: uuid
@@ -369,3 +396,4 @@ components:
       required:
         - hasNext
         - chats
+        

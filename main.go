@@ -30,13 +30,16 @@ func main() {
 	e.File("/api/swagger.yaml", "./docs/swagger.yaml")
 	e.Static("/api", "./docs/swagger-ui/dist")
 
-	e.POST("/api/login", h.NotImpl)
-
 	api := e.Group("/api")
 	{
 		api.GET("/ping", h.Ping)
 
 		api.GET("/ws", h.GetWebSocket)
+		api.POST("/chat/:rid", h.ChatPost)
+		api.GET("/chat/:rid", h.GetMessages)
+		api.POST("/chat", h.CreateChat)
+		api.POST("/login", h.Login)
+		api.POST("/user", h.SignUp)
 	}
 
 	e.Logger.Fatal(e.Start(":80"))
