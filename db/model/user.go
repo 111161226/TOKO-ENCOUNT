@@ -19,8 +19,8 @@ type UserUpdate struct {
 	UserName    string `json:"userName" db:"user_name" validate:"userName"`
 	Password    string `json:"password" validate:"password"`
 	NewPassword string `json:"newPassword" validate:"password"`
-	NeWPrefect  string `json:"newPrefect" validate:"prefect"`
-	NeWGender   string `json:"newGender" validate:"gender"`
+	NewPrefect  string `json:"newPrefect" validate:"prefect"`
+	NewGender   string `json:"newGender" validate:"gender"`
 }
 
 //struct for return value
