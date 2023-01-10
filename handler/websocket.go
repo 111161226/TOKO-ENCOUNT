@@ -41,16 +41,27 @@ func (ws *webSocketPublisher) NotifyNewMessage(userIds []string, roomId string, 
 		return err
 	}
 
-	for _, userId := range userIds {
-		connections, ok := ws.userIdConnectionPool[userId]
-		if !ok {
-			continue
+	if roomId == "0" { // 全体チャットの場合
+		for _, connections := range ws.userIdConnectionPool { // 全員に通知
+			for connection := range connections {
+				_, err = connection.Write(bytes)
+				if err != nil {
+					return err
+				}
+			}
 		}
+	} else {
+		for _, userId := range userIds { // 指定ユーザーにのみ通知
+			connections, ok := ws.userIdConnectionPool[userId]
+			if !ok {
+				continue
+			}
 
-		for connection := range connections {
-			_, err = connection.Write(bytes)
-			if err != nil {
-				return err
+			for connection := range connections {
+				_, err = connection.Write(bytes)
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
