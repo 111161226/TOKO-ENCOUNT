@@ -74,12 +74,3 @@ func (h *Handler) GetMessages(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, message)
 }
-
-func validatedBind(c echo.Context, i interface{}) error {
-	err := c.Bind(i) // リクエストボディの取り出し
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-	}
-
-	return nil
-}
