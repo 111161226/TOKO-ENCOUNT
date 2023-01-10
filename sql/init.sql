@@ -15,7 +15,7 @@ DROP TABLE IF EXISTS `user_deletes`;
 CREATE TABLE `user_deletes` (
   `flag` SMALLINT DEFAULT 0,
   `user_id` VARCHAR(37) NOT NULL,
-  PRIMARY KEY (`user_id`),
+  PRIMARY KEY (`user_id`)
 );
 
 -- db for private and open chat content
@@ -27,7 +27,7 @@ CREATE TABLE `chats` (
   `post` VARCHAR(100) NOT NULL,
   `post_user_id`  VARCHAR(37) NOT NULL,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`chat_id`),
+  PRIMARY KEY (`chat_id`)
 );
 
 -- db for room data
@@ -36,8 +36,8 @@ CREATE TABLE `room_data` (
   `room_id` VARCHAR(37) NOT NULL,
   `user_id` VARCHAR(37) NOT NULL,
   `latest_access` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `not_read` BIGINT(100) NOT NULL DEFAULT 0
-  PRIMARY KEY (`room_id`, `user_id`),
+  `not_read` BIGINT(100) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`room_id`, `user_id`)
 );
 
 -- db for session info
