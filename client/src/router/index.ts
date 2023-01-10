@@ -48,7 +48,7 @@ const publicRoutes: IRouteRecordRaw[] = [
     component: () => import('@/pages/Login/index.vue')
   },
   {
-    path: '/user',
+    path: '/signup',
     name: 'CreateAccount',
     component: () => import('@/pages/CreateAccount/index.vue')
   },
