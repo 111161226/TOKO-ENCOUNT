@@ -89,33 +89,21 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 	chatLst := []*model.ChatData{}
 	for _, m := range messages {
 		m.UserName = idNameMap[m.UserId]
-		if m.RoomId == "1" {
-			c := &model.ChatData{
-				RoomId:          m.RoomId,
-				Name:            "全体チャット",
-				LatestMessage:   m.Message,
-				NewMessageCount: m.NotRead,
-			}
-			chatLst = append(chatLst, c)
+		name := idNameMap[m.UserId]
+		if m.RoomId == "0" {
+			name = "全体チャット"
 		} else if m.UserId == userId {
 			// 最新メッセージが自分が送ったものの場合
-			c := &model.ChatData{
-				RoomId:          m.RoomId,
-				Name:            idNameMap[m.DestinationUserId],
-				LatestMessage:   m.Message,
-				NewMessageCount: m.NotRead,
-			}
-			chatLst = append(chatLst, c)
-		} else {
-			// 最新メッセージが相手が送ったものの場合
-			c := &model.ChatData{
-				RoomId:          m.RoomId,
-				Name:            idNameMap[m.UserId],
-				LatestMessage:   m.Message,
-				NewMessageCount: m.NotRead,
-			}
-			chatLst = append(chatLst, c)
+			name = idNameMap[m.DestinationUserId]
+
 		}
+		c := &model.ChatData{
+			RoomId:          m.RoomId,
+			Name:            name,
+			LatestMessage:   m.Message,
+			NewMessageCount: m.NotRead,
+		}
+		chatLst = append(chatLst, c)
 	}
 
 	// 自分が参加しているルームの全数を取得
