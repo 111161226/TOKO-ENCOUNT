@@ -53,6 +53,12 @@ export const sidebarRoutes: IRouteRecordRaw[] = [
 
 const privateRoutes: IRouteRecordRaw[] = [
   {
+    path: '/chat',
+    name: 'ChatList',
+    component: () => import('@/pages/ChatList/index.vue'),
+    meta: { title: 'ChatList' }
+  },
+  {
     path: '/chat/:id',
     name: 'Chat',
     component: () => import('@/pages/Chat/index.vue'),
