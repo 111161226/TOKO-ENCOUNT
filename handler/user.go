@@ -43,9 +43,9 @@ func (h *Handler) SignUp(c echo.Context) error {
 
 	//重複チェック
 	userdup, err := h.ui.CheckUsedUserName(u.UserName)
-	if err != nil {// DBエラーの場合
+	if err != nil { // DBエラーの場合
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-	} else if userdup != nil {// 重複している場合
+	} else if userdup != nil { // 重複している場合
 		return echo.NewHTTPError(http.StatusUnauthorized, "Username is already taken")
 	}
 
