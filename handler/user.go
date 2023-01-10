@@ -57,3 +57,27 @@ func (h *Handler) SignUp(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, &user)
 }
+
+func (h *Handler) EditProfile(c echo.Context) error {
+	//入力取得
+	u := new(model.UserUpdate)
+	if err := c.Bind(u); err != nil{
+		return err
+	}
+
+	//セッション取得
+	sess, err := h.PickSession(c)
+	if err != nil {
+		return err
+	}
+
+	//プロフィール更新
+	newprofile, err := h.ui.EditUser(sess.UserId, u)
+	if err != nil { //DBエラー
+		return err
+	} else if newprofile == nil { //パスワード不一致
+		return echo.NewHTTPError(http.StatusUnauthorized, "incorrect password")
+	}
+
+	return c.JSON(http.StatusOK, newprofile)
+}
