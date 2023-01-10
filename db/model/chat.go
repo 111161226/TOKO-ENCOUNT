@@ -35,3 +35,14 @@ type ChatList struct {
 	HasNext bool         `json:"hasNext"`
 	Chats   *[]*ChatData `json:"chats"`
 }
+
+//struct for user's own room
+type ChatUser struct {
+	RoomId    string    `json:"RoomId" db:"room_id"`
+	UserId    string    `json:"userId" db:"user_id"`	
+}
+
+//struct for user's all own room
+type ChatUserList struct {
+	ChatUsers *[]*ChatUser `json:"chatusers"`
+}

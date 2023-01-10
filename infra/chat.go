@@ -208,3 +208,18 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 
 	return res, nil
 }
+
+func (ci *chatInfra) GetChatByRoomId(roomId string) (*model.ChatUserList, error) {
+	users := []*model.ChatUser{}
+	err := ci.db.Select(
+		&users,
+		"SELECT `room_id`, `user_id` FROM room_datas WHRER room_id = ?",
+		roomId,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &model.ChatUserList{
+		ChatUsers: &users,
+	}, nil
+}
