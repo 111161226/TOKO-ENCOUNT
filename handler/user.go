@@ -81,3 +81,19 @@ func (h *Handler) EditProfile(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, newprofile)
 }
+
+func (h *Handler) GetMyUser(c echo.Context) error{
+	//セッション取得
+	sess, err := h.PickSession(c)
+	if err != nil {
+		return err
+	}
+
+	//自身のユーザー情報取得
+	user, err := h.ui.GetUser(sess.UserId)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, user)
+}

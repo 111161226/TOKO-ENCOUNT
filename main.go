@@ -38,6 +38,7 @@ func main() {
 		api.POST("/chat/new", h.NotImpl)
 		api.POST("/login", h.Login)
 		api.POST("/user", h.SignUp)
+		api.GET("/user/me", h.GetMyUser)
 		api.PATCH("/user/me", h.EditProfile)
 	}
 
