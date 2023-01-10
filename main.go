@@ -38,7 +38,7 @@ func main() {
 		api.POST("/chat/new", h.NotImpl)
 		api.POST("/login", h.Login)
 		api.POST("/user", h.SignUp)
-		api.POST("/user/me", h.EditProfile)
+		api.PATCH("/user/me", h.EditProfile)
 	}
 
 	e.Logger.Fatal(e.Start(":80"))
