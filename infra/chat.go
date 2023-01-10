@@ -57,7 +57,7 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 	// ユーザー名情報が必要なユーザーIDを列挙
 	ids := []string{}
 	for _, m := range messages {
-		if m.RoomId == "1" {
+		if m.RoomId == "0" {
 			continue
 		}
 
