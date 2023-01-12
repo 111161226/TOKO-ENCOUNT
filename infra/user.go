@@ -59,7 +59,7 @@ func (ui *userInfra) CreateUser(user *model.User) (*model.UserWithoutPass, error
 }
 
 func (ui *userInfra) GetUser(userId string) (*model.UserWithoutPass, error) {
-	///ユーザ取得
+	//ユーザ取得
 	var user model.UserWithoutPass
 	err := ui.db.Get(
 		&user, "SELECT `user_id`, `user_name`, `prefect`, `gender` FROM `users` WHERE `user_id` = ?",
@@ -85,17 +85,21 @@ func (ui *userInfra) EditUser(userId string, user *model.UserUpdate) (*model.Use
 
 	//パスワード照合
 	if oldpassword != hash(user.Password) {
-		return nil, fmt.Errorf("err : %s", "Incorrect paassword")
+		return nil, nil		//間違っている場合は返り値nil
 	}
 
 	//DB更新
 	_, err = ui.db.Exec(
-		"UPDATE `users` SET `user_name` = ?, `prefect` = ?, `gender` = ?",
+		"UPDATE `users` SET `user_name` = ?, `password` = ?, `prefect` = ?, `gender` = ? WHERE `user_id` = ?",
 		user.UserName,
-		user.NewPassword,
+		hash(user.NewPassword),
 		user.NewPrefect,
 		user.NewGender,
+		userId,
 	)
+	if err != nil {
+		return nil, err
+	}
 
 	return &model.UserWithoutPass{
 		UserId:   userId,
