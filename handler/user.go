@@ -63,8 +63,9 @@ func (h *Handler) SignUp(c echo.Context) error {
 func (h *Handler) EditProfile(c echo.Context) error {
 	//入力取得
 	u := new(model.UserUpdate)
-	if err := c.Bind(u); err != nil{
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	err := validatedBind(c, u)
+	if err != nil {
+		return err
 	}
 
 	//セッション取得
@@ -87,8 +88,9 @@ func (h *Handler) EditProfile(c echo.Context) error {
 func (h *Handler) GetMyUser(c echo.Context) error{
 	//セッション取得
 	sess, err := h.PickSession(c)
+	err := validatedBind(c, u)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return err
 	}
 
 	//自身のユーザー情報取得
