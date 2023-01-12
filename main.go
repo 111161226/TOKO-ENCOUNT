@@ -35,6 +35,7 @@ func main() {
 		api.GET("/ping", h.Ping)
 
 		api.GET("/ws", h.GetWebSocket)
+		api.GET("/chat", h.GetChatList)
 		api.POST("/chat/:rid", h.ChatPost)
 		api.GET("/chat/:rid", h.GetMessages)
 		api.POST("/chat", h.CreateChat)

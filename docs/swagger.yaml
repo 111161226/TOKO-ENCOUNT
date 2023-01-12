@@ -133,7 +133,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/User"
+              $ref: "#/components/schemas/UserUpdate"
       responses:
         '200':
           description: プロフィール編集に成功しました
@@ -282,6 +282,31 @@ components:
         - prefect
         - gender
 
+    UserUpdate:
+      type: object
+      properties:
+        userName:
+          type: string
+          example: testUserName
+        password:
+          type: string
+          example: "********"
+        newPassword:
+          type: string
+          example: "********"
+        prefect:
+          type: string
+          example: 東京都
+        gender:
+          type: string
+          example: male
+      required:
+        - userName
+        - password
+        - newPassword
+        - prefect
+        - gender
+
     UserSimple:
       type: object
       properties:
@@ -396,4 +421,3 @@ components:
       required:
         - hasNext
         - chats
-        
