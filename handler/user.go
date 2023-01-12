@@ -11,7 +11,7 @@ func (h *Handler) Login(c echo.Context) error {
 	//入力取得
 	u := new(model.UserSimple)
 	if err := c.Bind(u); err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	//ログインチェック
@@ -23,7 +23,7 @@ func (h *Handler) Login(c echo.Context) error {
 	//セッション作成
 	err = createSessionAndSetCookie(c, h, user.UserId)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, &user)
@@ -33,7 +33,7 @@ func (h *Handler) SignUp(c echo.Context) error {
 	//入力取得
 	u := new(model.User)
 	if err := c.Bind(u); err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	//ユーザ名、パスワード確認
@@ -52,7 +52,7 @@ func (h *Handler) SignUp(c echo.Context) error {
 	//登録
 	user, err := h.ui.CreateUser(u)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, &user)
@@ -62,13 +62,13 @@ func (h *Handler) EditProfile(c echo.Context) error {
 	//入力取得
 	u := new(model.UserUpdate)
 	if err := c.Bind(u); err != nil{
-		return err
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	//セッション取得
 	sess, err := h.PickSession(c)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	//プロフィール更新
@@ -86,13 +86,13 @@ func (h *Handler) GetMyUser(c echo.Context) error{
 	//セッション取得
 	sess, err := h.PickSession(c)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	//自身のユーザー情報取得
 	user, err := h.ui.GetUser(sess.UserId)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, user)
