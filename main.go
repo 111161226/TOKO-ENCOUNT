@@ -33,9 +33,12 @@ func main() {
 	api := e.Group("/api")
 	{
 		api.GET("/ping", h.Ping)
-		api.POST("/chat/:rid", h.NotImpl)
-		api.GET("/chat/:rid", h.NotImpl)
-		api.POST("/chat/new", h.NotImpl)
+
+		api.GET("/ws", h.GetWebSocket)
+		api.GET("/chat", h.GetChatList)
+		api.POST("/chat/:rid", h.ChatPost)
+		api.GET("/chat/:rid", h.GetMessages)
+		api.POST("/chat", h.CreateChat)
 		api.POST("/login", h.Login)
 		api.POST("/user", h.SignUp)
 		api.GET("/user/me", h.GetMyUser)

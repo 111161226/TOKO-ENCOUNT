@@ -1,13 +1,14 @@
 package infra
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+	"fmt"
+
 	"github.com/cs-sysimpl/SakataKintoki/db/model"
 	"github.com/cs-sysimpl/SakataKintoki/db/repository"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
-	"fmt"
-	"crypto/sha256"
-	"encoding/hex"
 )
 
 type userInfra struct {
@@ -50,10 +51,10 @@ func (ui *userInfra) CreateUser(user *model.User) (*model.UserWithoutPass, error
 	}
 
 	return &model.UserWithoutPass{
-		UserId: userId,
+		UserId:   userId,
 		UserName: user.UserName,
-		Prefect: user.Prefect,
-		Gender: user.Gender,
+		Prefect:  user.Prefect,
+		Gender:   user.Gender,
 	}, nil
 }
 
@@ -80,8 +81,8 @@ func (ui *userInfra) EditUser(userId string, user *model.UserUpdate) (*model.Use
 	)
 	if err != nil {
 		return nil, err
-	}	
-	
+	}
+
 	//パスワード照合
 	if oldpassword != hash(user.Password) {
 		return nil, nil		//間違っている場合は返り値nil
@@ -101,10 +102,10 @@ func (ui *userInfra) EditUser(userId string, user *model.UserUpdate) (*model.Use
 	}
 
 	return &model.UserWithoutPass{
-		UserId : userId,
-		UserName : user.UserName,
-		Prefect : user.NewPrefect,
-		Gender : user.NewGender,
+		UserId:   userId,
+		UserName: user.UserName,
+		Prefect:  user.NewPrefect,
+		Gender:   user.NewGender,
 	}, nil
 }
 
