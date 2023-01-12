@@ -14,16 +14,19 @@ type Handler struct {
 	ui repository.UserRepository
 	ci repository.ChatRepository
 	si repository.SessionRepository
+	ws *webSocketPublisher
 }
 
 func NewHandler(db *sqlx.DB) *Handler {
 	ui := infra.NewUserInfra(db)
 	ci := infra.NewChatInfra(db)
 	si := infra.NewSessionInfra(db)
+	ws := newWebSocketPublisher()
 	return &Handler{
 		ui: ui,
 		ci: ci,
 		si: si,
+		ws: ws,
 	}
 }
 

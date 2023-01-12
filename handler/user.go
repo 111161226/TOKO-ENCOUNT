@@ -10,7 +10,8 @@ import (
 func (h *Handler) Login(c echo.Context) error {
 	//入力取得
 	u := new(model.UserSimple)
-	if err := c.Bind(u); err != nil {
+	err := validatedBind(c, u)
+	if err != nil {
 		return err
 	}
 
@@ -32,7 +33,8 @@ func (h *Handler) Login(c echo.Context) error {
 func (h *Handler) SignUp(c echo.Context) error {
 	//入力取得
 	u := new(model.User)
-	if err := c.Bind(u); err != nil {
+	err := validatedBind(c, u)
+	if err != nil {
 		return err
 	}
 
@@ -43,9 +45,9 @@ func (h *Handler) SignUp(c echo.Context) error {
 
 	//重複チェック
 	userdup, err := h.ui.CheckUsedUserName(u.UserName)
-	if err != nil {// DBエラーの場合
+	if err != nil { // DBエラーの場合
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-	} else if userdup != nil {// 重複している場合
+	} else if userdup != nil { // 重複している場合
 		return echo.NewHTTPError(http.StatusUnauthorized, "Username is already taken")
 	}
 

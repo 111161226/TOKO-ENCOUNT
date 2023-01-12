@@ -1,8 +1,6 @@
 package middleware
 
 import (
-	"net/http"
-
 	"github.com/cs-sysimpl/SakataKintoki/handler"
 	"github.com/labstack/echo/v4"
 )

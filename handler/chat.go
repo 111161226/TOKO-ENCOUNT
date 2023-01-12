@@ -4,9 +4,10 @@ import (
 	"net/http"
 	"strconv"
 
+	"fmt"
+
 	"github.com/cs-sysimpl/SakataKintoki/db/model"
 	"github.com/labstack/echo/v4"
-	"fmt"
 )
 
 func (h *Handler) ChatPost(c echo.Context) error {
@@ -23,6 +24,11 @@ func (h *Handler) ChatPost(c echo.Context) error {
 	}
 
 	postedMessage, err := h.ci.PostChat(rid, did, post, sess.UserId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	err = h.ws.NotifyNewMessage([]string{did}, rid, postedMessage)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -112,13 +118,4 @@ func (h *Handler) GetChatList(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, res)
-}
-
-func validatedBind(c echo.Context, i interface{}) error {
-	err := c.Bind(i) // リクエストボディの取り出し
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-	}
-
-	return nil
 }

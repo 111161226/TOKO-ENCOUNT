@@ -5,8 +5,8 @@ import (
 
 	"github.com/cs-sysimpl/SakataKintoki/db/model"
 	"github.com/cs-sysimpl/SakataKintoki/db/repository"
-	"github.com/jmoiron/sqlx"
 	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
 )
 
 type chatInfra struct {
@@ -44,7 +44,7 @@ func (ci *chatInfra) PostChat(roomId string, destinationId string, message *mode
 		post_user_id,
 	)
 
-	//return posting message 
+	//return posting message
 	return &mess, nil
 }
 
@@ -71,7 +71,7 @@ func (ci *chatInfra) GetMessages(roomId string, limit int, offset int) (*model.M
 	}
 	return &model.MessageList{
 		Messages: &mess,
-		HasNext: count > len(mess),
+		HasNext:  count > len(mess),
 	}, nil
 }
 
@@ -107,7 +107,7 @@ func (ci *chatInfra) CreateChat(destinationId string, post_user_id string) (*mod
 		return nil, err
 	}
 	//post first message
-	return ci.PostChat(roomId, destinationId , &message, post_user_id) 
+	return ci.PostChat(roomId, destinationId, &message, post_user_id)
 }
 
 func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.ChatList, error) {
