@@ -89,11 +89,12 @@ func (ui *userInfra) EditUser(userId string, user *model.UserUpdate) (*model.Use
 
 	//DB更新
 	_, err = ui.db.Exec(
-		"UPDATE `users` SET `user_name` = ?, `password` = ?, `prefect` = ?, `gender` = ?",
+		"UPDATE `users` SET `user_name` = ?, `password` = ?, `prefect` = ?, `gender` = ? WHERE `user_id` = ?",
 		user.UserName,
-		user.NewPassword,
+		hash(user.NewPassword),
 		user.NewPrefect,
 		user.NewGender,
+		userId,
 	)
 	if err != nil {
 		return nil, err

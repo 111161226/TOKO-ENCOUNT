@@ -74,7 +74,7 @@ func (h *Handler) EditProfile(c echo.Context) error {
 	//プロフィール更新
 	newprofile, err := h.ui.EditUser(sess.UserId, u)
 	if err != nil { //DBエラー
-		return err
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	} else if newprofile == nil { //パスワード不一致
 		return echo.NewHTTPError(http.StatusUnauthorized, "incorrect password")
 	}
