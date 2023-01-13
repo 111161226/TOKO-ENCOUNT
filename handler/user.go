@@ -24,7 +24,7 @@ func (h *Handler) Login(c echo.Context) error {
 	//セッション作成
 	err = createSessionAndSetCookie(c, h, user.UserId)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return err
 	}
 
 	return c.JSON(http.StatusOK, &user)
@@ -57,6 +57,11 @@ func (h *Handler) SignUp(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
+	err = createSessionAndSetCookie(c, h, user.UserId)
+	if err != nil {
+		return err
+	}
+
 	return c.JSON(http.StatusOK, &user)
 }
 
@@ -71,7 +76,7 @@ func (h *Handler) EditProfile(c echo.Context) error {
 	//セッション取得
 	sess, err := h.PickSession(c)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return err
 	}
 
 	//プロフィール更新
