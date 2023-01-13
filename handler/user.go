@@ -40,7 +40,7 @@ func (h *Handler) SignUp(c echo.Context) error {
 
 	//ユーザ名、パスワード確認
 	if u.UserName == "" || u.Password == "" {
-		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid name or password")
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid name or password")
 	}
 
 	//重複チェック
@@ -48,7 +48,7 @@ func (h *Handler) SignUp(c echo.Context) error {
 	if err != nil { // DBエラーの場合
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	} else if userdup != nil { // 重複している場合
-		return echo.NewHTTPError(http.StatusUnauthorized, "Username is already taken")
+		return echo.NewHTTPError(http.StatusBadRequest, "Username is already taken")
 	}
 
 	//登録
@@ -85,7 +85,7 @@ func (h *Handler) EditProfile(c echo.Context) error {
 	return c.JSON(http.StatusOK, newprofile)
 }
 
-func (h *Handler) GetMyUser(c echo.Context) error{
+func (h *Handler) GetMyUser(c echo.Context) error {
 	//セッション取得
 	sess, err := h.PickSession(c)
 	if err != nil {
