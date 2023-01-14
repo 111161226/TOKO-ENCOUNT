@@ -2,6 +2,8 @@
 import apis, { Message } from '@/lib/apis'
 import { useMe } from '@/store/me'
 import { useMessages } from '@/store/message'
+import { showErrorMessage } from '@/util/showErrorMessage'
+import { AxiosError } from 'axios'
 import { nextTick, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import ChatInput from './components/ChatInput.vue'
@@ -15,7 +17,7 @@ const roomId = route.params.id as string
 
 const myUserName = ref(storeMe.getMe?.userName)
 const otherUserName = ref('')
-const messages = ref<Message[]>()
+const messages = ref<Message[]>([])
 const contentDivRef = ref<HTMLDivElement>()
 
 const onSubmit = async () => {
@@ -38,14 +40,19 @@ watch(
 )
 
 onMounted(async () => {
-  const { data } = await apis.getChatMessages(roomId)
-  messages.value = data.messages
+  try {
+    const { data } = await apis.getChatMessages(roomId)
+    messages.value = data.messages
 
-  for (const message of messages.value) {
-    if (message.userName !== myUserName.value) {
-      otherUserName.value = message.userName
-      break
+    for (const message of messages.value) {
+      if (message.userName !== myUserName.value) {
+        otherUserName.value = message.userName
+        break
+      }
     }
+  } catch (e: any) {
+    const err: AxiosError = e
+    showErrorMessage(err)
   }
 })
 </script>
@@ -61,7 +68,7 @@ onMounted(async () => {
     <div class="input-container">
       <chat-input class="input" />
       <div @click="onSubmit" @keydown.enter="onSubmit">
-        <el-icon size="1.5rem" class="icon"><Promotion /></el-icon>
+        <el-icon size="1.5rem" class="icon"><promotion /></el-icon>
       </div>
     </div>
   </div>
@@ -82,6 +89,7 @@ onMounted(async () => {
 .content {
   overflow-y: auto;
   padding: 0.5rem 1rem;
+  flex-grow: 1;
 }
 
 .input-container {

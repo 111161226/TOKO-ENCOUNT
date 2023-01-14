@@ -30,5 +30,5 @@ onMounted(() => {
     resize="none"
     placeholder="Message"
     class="input"
-  ></el-input>
+  />
 </template>
