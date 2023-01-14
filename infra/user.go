@@ -2,7 +2,9 @@ package infra
 
 import (
 	"crypto/sha256"
+	"database/sql"
 	"encoding/hex"
+	"errors"
 	"fmt"
 
 	"github.com/cs-sysimpl/SakataKintoki/db/model"
@@ -85,7 +87,7 @@ func (ui *userInfra) EditUser(userId string, user *model.UserUpdate) (*model.Use
 
 	//パスワード照合
 	if oldpassword != hash(user.Password) {
-		return nil, nil		//間違っている場合は返り値nil
+		return nil, nil //間違っている場合は返り値nil
 	}
 
 	//DB更新
@@ -146,6 +148,11 @@ func (ui *userInfra) CheckUsedUserName(userName string) (*model.UserWithoutPass,
 		userName,
 	)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			// 名前の重複したユーザーが存在しないならエラーではない
+			return nil, nil
+		}
+
 		return nil, err
 	}
 
