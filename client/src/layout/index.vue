@@ -5,7 +5,7 @@ import Sidebar from './Sidebar.vue'
 <template>
   <div class="root-container">
     <sidebar />
-    <router-view />
+    <router-view class="view" />
   </div>
 </template>
 
@@ -14,5 +14,8 @@ import Sidebar from './Sidebar.vue'
   display: flex;
   flex-direction: row;
   height: 100%;
+}
+.view {
+  width: 100%;
 }
 </style>
