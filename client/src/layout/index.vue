@@ -16,6 +16,6 @@ import Sidebar from './Sidebar.vue'
   height: 100%;
 }
 .view {
-  width: 100%;
+  flex-grow: 1;
 }
 </style>
