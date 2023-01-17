@@ -7,6 +7,20 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+func (h *Handler) Logout(c echo.Context) error {
+	sess, err := h.PickSession(c)
+	if err != nil {
+		return err
+	}
+
+	err = h.si.DeleteSessionBySessionId(sess.SessionId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.NoContent(http.StatusOK)
+}
+
 func (h *Handler) Login(c echo.Context) error {
 	//入力取得
 	u := new(model.UserSimple)
