@@ -39,7 +39,7 @@ func (ci *chatInfra) PostChat(roomId string, destinationId string, message *mode
 	mess := model.Message{}
 	err = ci.db.Get(
 		&mess,
-		"SELECT post, room_id, post_user_id, user_name, created_at FROM chats INNER JOIN users ON post_user_id = user_id WHERE room_id = ? AND post_user_id = ? ORDER BY `created_at` DESC",
+		"SELECT post, chat_id, post_user_id, user_name, created_at FROM chats INNER JOIN users ON post_user_id = user_id WHERE room_id = ? AND post_user_id = ? ORDER BY `created_at` DESC",
 		roomId,
 		post_user_id,
 	)
@@ -52,7 +52,7 @@ func (ci *chatInfra) GetMessages(roomId string, limit int, offset int) (*model.M
 	mess := []*model.Message{}
 	err := ci.db.Select(
 		&mess,
-		"SELECT post, room_id, post_user_id, user_name, created_at FROM chats INNER JOIN users ON post_user_id = user_id WHERE room_id = ? ORDER BY `created_at` DESC LIMIT ? OFFSET ?",
+		"SELECT post, chat_id, post_user_id, user_name, created_at FROM chats INNER JOIN users ON post_user_id = user_id WHERE room_id = ? ORDER BY `created_at` DESC LIMIT ? OFFSET ?",
 		roomId,
 		limit,
 		offset,
@@ -121,7 +121,7 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 	// 自分が参加しているルームとその最新メッセージを取得
 	err := ci.db.Select(
 		&messages,
-		"SELECT `chat`.`post`, `chat`.`chat_id`, `chat`.`post_user_id`, `chat`.`created_at`, `chat`.`destination_user_id`, `room`.`room_id`, `room`.`not_read` FROM `room_data` as `room` INNER JOIN (SELECT * FROM `chats` GROUP BY `room_id` ORDER BY `created_at` DESC LIMIT 1) as `chat` ON `room`.`room_id` = `chat`.`room_id` AND `room`.`user_id` = ? ORDER BY `chat`.`created_at` DESC LIMIT ? OFFSET ?",
+		"SELECT `chat`.`post`, `chat`.`chat_id`, `chat`.`post_user_id`, `chat`.`created_at`, `chat`.`destination_user_id`, `room`.`room_id`, `room`.`not_read` FROM `room_datas` as `room` INNER JOIN (SELECT * FROM `chats` GROUP BY `room_id` ORDER BY `created_at` DESC LIMIT 1) as `chat` ON `room`.`room_id` = `chat`.`room_id` AND `room`.`user_id` = ? ORDER BY `chat`.`created_at` DESC LIMIT ? OFFSET ?",
 		userId,
 		limit,
 		offset,

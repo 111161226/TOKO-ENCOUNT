@@ -10,7 +10,7 @@ type MessageSimple struct {
 //struct for message
 type Message struct {
 	Post      string    `json:"post" db:"post"`
-	RoomId    string    `json:"RoomId" db:"room_id"`
+	ChatId    string    `json:"chatId" db:"chat_id"`
 	UserId    string    `json:"userId" db:"post_user_id"`
 	UserName  string    `json:"userName" db:"user_name"`
 	CreatedAt time.Time `json:"createdAt" db:"created_at"`
