@@ -132,10 +132,10 @@ func (h *Handler) SearchUser(c echo.Context) error {
 	prefect := c.QueryParam("prefect")
 
 	//対象となるユーザ取得
-	users, err := h.ui.SearchUser(limit, offset, name, gender, prefect)
+	userlist, err := h.ui.GetUserList(limit, offset, name, gender, prefect)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, users)
+	return c.JSON(http.StatusOK, userlist)
 }

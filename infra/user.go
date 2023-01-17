@@ -160,7 +160,7 @@ func (ui *userInfra) CheckUsedUserName(userName string) (*model.UserWithoutPass,
 	return &user, nil
 }
 
-func (ui *userInfra) SearchUser(limit int, offset int, name string, gender string, prefect string) (*model.UserList, error) {
+func (ui *userInfra) GetUserList(limit int, offset int, name string, gender string, prefect string) (*model.UserList, error) {
 	//対象となるユーザを取得
 	var users []*model.UserWithoutPass
 	err := ui.db.Select(
@@ -199,6 +199,7 @@ func (ui *userInfra) SearchUser(limit int, offset int, name string, gender strin
 		return nil, err
 	}
 
+	//対象ユーザを全て取得しているか確認
 	res := &model.UserList{
 		HasNext: count > len(users) + offset,
 		Users: &users,
