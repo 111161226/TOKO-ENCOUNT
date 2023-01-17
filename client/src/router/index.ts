@@ -46,7 +46,7 @@ export const sidebarRoutes: IRouteRecordRaw[] = [
   {
     path: '/profile',
     name: 'Profile',
-    component: {}, // TODO
+    component: () => import('@/pages/EditAccount/index.vue'), // TODO
     meta: { title: 'Profile' }
   }
 ]
