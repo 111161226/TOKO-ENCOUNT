@@ -1,8 +1,27 @@
 <script lang="ts" setup>
+import { AxiosError } from 'axios'
+import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import { sidebarRoutes } from '@/router'
 import { useMe } from '@/store/me'
+import { showErrorMessage } from '@/util/showErrorMessage'
 
+const router = useRouter()
 const me = useMe()
+
+const logout = async () => {
+  try {
+    await me.logout()
+    ElMessage({
+      message: 'ログアウトしました',
+      type: 'success'
+    })
+    router.push({ name: 'Login' })
+  } catch (e: any) {
+    const err: AxiosError = e
+    showErrorMessage(err)
+  }
+}
 </script>
 
 <template>
@@ -21,7 +40,7 @@ const me = useMe()
     </div>
     <div class="logout">
       <router-link :to="{ name: 'Login' }" class="link">
-        <el-button class="button" @click="me.logout">Logout</el-button>
+        <el-button class="button" @click="logout">Logout</el-button>
       </router-link>
     </div>
   </div>
