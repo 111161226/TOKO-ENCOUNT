@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import api, { MessageList } from '@/lib/apis'
+import api, { Message, MessageList } from '@/lib/apis'
 
 export const useMessages = defineStore('messages', {
   state: (): { messages: Record<string, MessageList>; loading: boolean } => ({
@@ -39,6 +39,18 @@ export const useMessages = defineStore('messages', {
     },
     setLoading(value: boolean) {
       this.loading = value
+    },
+    /** websocket 以外では呼び出さない */
+    catchNewMessage(roomId: string, message: Message) {
+      if (!this.messages[roomId]) {
+        this.messages = {
+          ...this.messages,
+          [roomId]: { hasNext: true, messages: [message] }
+        }
+        return
+      }
+
+      this.messages[roomId].messages.unshift(message)
     }
   }
 })
