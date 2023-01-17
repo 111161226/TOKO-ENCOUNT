@@ -29,19 +29,17 @@ const logout = async () => {
     <div class="routes-container">
       <div v-for="route in sidebarRoutes" :key="route.name" class="route">
         <router-link
-          v-if="route.meta && $route.meta.title"
+          v-if="route.meta && route.meta.title"
           :to="{ name: route.name }"
           class="link"
           :class="{ 'active-link': $route.name === route.name }"
         >
-          {{ route.name }}
+          {{ route.meta.title }}
         </router-link>
       </div>
     </div>
     <div class="logout">
-      <router-link :to="{ name: 'Login' }" class="link">
-        <el-button class="button" @click="logout">Logout</el-button>
-      </router-link>
+      <el-button class="button" @click="logout">Logout</el-button>
     </div>
   </div>
 </template>
@@ -85,6 +83,7 @@ const logout = async () => {
 .logout {
   margin-top: auto;
 }
+
 .button {
   background-color: $color-primary;
   color: white;
