@@ -159,3 +159,50 @@ func (ui *userInfra) CheckUsedUserName(userName string) (*model.UserWithoutPass,
 	// 重複している場合はuser!=nil
 	return &user, nil
 }
+
+func (ui *userInfra) SearchUser(limit int, offset int, name string, gender string, prefect string) (*model.UserList, error) {
+	//対象となるユーザを取得
+	var users []*model.UserWithoutPass
+	err := ui.db.Select(
+		&users, "SELECT `user_id`, `user_name`, `prefect`, `gender` FROM `users` WHERE CASE WHEN ? = `` THEN ? ELSE `user_name` END = ?, CASE WHEN ? = `` THEN ? ELSE `gender` END = ?, CASE WHEN ? = `` THEN ? ELSE `prefect` END = ? DESC LIMIT ? OFFSET ?",
+		name,
+		name,
+		name,
+		gender,
+		gender,
+		gender,
+		prefect,
+		prefect,
+		prefect,
+		limit,
+		offset,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	//対象となるユーザの全数を取得
+	var count int
+	err = ui.db.Select(
+		&count, "SELECT COUNT(*) FROM `users` WHERE CASE WHEN ? = `` THEN ? ELSE `user_name` END = ?, CASE WHEN ? = `` THEN ? ELSE `gender` END = ?, CASE WHEN ? = `` THEN ? ELSE `prefect` END = ?",
+		name,
+		name,
+		name,
+		gender,
+		gender,
+		gender,
+		prefect,
+		prefect,
+		prefect,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &model.UserList{
+		HasNext: count > len(users) + offset,
+		Users: &users,
+	}
+
+	return res, nil
+}
