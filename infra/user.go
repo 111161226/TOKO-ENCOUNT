@@ -164,14 +164,17 @@ func (ui *userInfra) GetUserList(limit int, offset int, name string, gender stri
 	//対象となるユーザを取得
 	var users []*model.UserWithoutPass
 	err := ui.db.Select(
-		&users, "SELECT `user_id`, `user_name`, `prefect`, `gender` FROM `users` WHERE CASE WHEN ? = `` THEN ? ELSE `user_name` END = ?, CASE WHEN ? = `` THEN ? ELSE `gender` END = ?, CASE WHEN ? = `` THEN ? ELSE `prefect` END = ? DESC LIMIT ? OFFSET ?",
+		&users, "SELECT `user_id`, `user_name`, `prefect`, `gender` FROM `users` WHERE CASE WHEN ? = ? THEN ? ELSE `user_name` END = ? AND CASE WHEN ? = ? THEN ? ELSE `gender` END = ? AND CASE WHEN ? = ? THEN ? ELSE `prefect` END = ? LIMIT ? OFFSET ?",
 		name,
+		"",
 		name,
 		name,
 		gender,
+		"",
 		gender,
 		gender,
 		prefect,
+		"",
 		prefect,
 		prefect,
 		limit,
@@ -183,15 +186,18 @@ func (ui *userInfra) GetUserList(limit int, offset int, name string, gender stri
 
 	//対象となるユーザの全数を取得
 	var count int
-	err = ui.db.Select(
-		&count, "SELECT COUNT(*) FROM `users` WHERE CASE WHEN ? = `` THEN ? ELSE `user_name` END = ?, CASE WHEN ? = `` THEN ? ELSE `gender` END = ?, CASE WHEN ? = `` THEN ? ELSE `prefect` END = ?",
+	err = ui.db.Get(
+		&count, "SELECT COUNT(*) FROM `users` WHERE CASE WHEN ? = ? THEN ? ELSE `user_name` END = ? AND CASE WHEN ? = ? THEN ? ELSE `gender` END = ? AND CASE WHEN ? = ? THEN ? ELSE `prefect` END = ?",
 		name,
+		"",
 		name,
 		name,
 		gender,
+		"",
 		gender,
 		gender,
 		prefect,
+		"",
 		prefect,
 		prefect,
 	)
@@ -199,11 +205,8 @@ func (ui *userInfra) GetUserList(limit int, offset int, name string, gender stri
 		return nil, err
 	}
 
-	//対象ユーザを全て取得しているか確認
-	res := &model.UserList{
+	return &model.UserList{
 		HasNext: count > len(users) + offset,
 		Users: &users,
-	}
-
-	return res, nil
+	}, nil
 }
