@@ -1,17 +1,81 @@
 <script lang="ts" setup>
+import { AxiosError } from 'axios'
+import { ref, watchEffect, onMounted, computed } from 'vue'
+import { ElLoading } from 'element-plus'
 import { Message } from '@/lib/apis'
+import { showErrorMessage } from '@/util/showErrorMessage'
+import { useMessages } from '@/store/message'
 
-defineProps<{
-  messages: Message[] | undefined
+const props = defineProps<{
+  roomId: string
+  messages: Message[]
   myUserName: string | undefined
 }>()
+
+const messageStore = useMessages()
+
+const hasNext = computed(() => messageStore.getMessage(props.roomId).hasNext)
+const loading = computed(() => messageStore.getLoading())
+
+const loadingEle = ref<HTMLDivElement>()
+const messagesEle = ref<HTMLDivElement[]>([])
+
+const fetchData = async () => {
+  try {
+    messageStore.setLoading(true)
+    await messageStore.fetchData(props.roomId, 20)
+  } catch (e: any) {
+    const err: AxiosError = e
+    showErrorMessage(err)
+  } finally {
+    messageStore.setLoading(false)
+  }
+}
+
+watchEffect(onCleanup => {
+  const { value } = loadingEle
+  if (!value || !hasNext.value || loading.value) {
+    return
+  }
+
+  const observer = new IntersectionObserver(
+    async entries => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) {
+          return
+        }
+      }
+
+      const oldestEle = messagesEle.value.slice(-1)[0]
+      await fetchData()
+      oldestEle.scrollTo({ top: 100 })
+    },
+    {
+      threshold: 0.5
+    }
+  )
+  observer.observe(value)
+
+  onCleanup(() => observer.disconnect())
+})
+
+onMounted(async () => {
+  if (loadingEle.value) {
+    ElLoading.service({ target: loadingEle.value })
+  }
+})
 </script>
 
 <template>
   <div class="message-list">
     <div
-      v-for="message in messages"
+      v-for="(message, index) in messages"
       :key="message.chatId"
+      :ref="
+        el => {
+          messagesEle[index] = el as HTMLDivElement
+        }
+      "
       :class="{
         message: true,
         'my-message': message.userName === myUserName,
@@ -20,13 +84,14 @@ defineProps<{
     >
       {{ message.post }}
     </div>
+    <div v-if="hasNext" ref="loadingEle" class="loading" />
   </div>
 </template>
 
 <style lang="scss" scoped>
 .message-list {
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
 }
 .message {
   white-space: pre-wrap;
@@ -45,5 +110,9 @@ defineProps<{
   background-color: $bgcolor-primary;
   border-radius: 8px;
   border-bottom-left-radius: 0;
+}
+
+.loading {
+  height: 3rem;
 }
 </style>
