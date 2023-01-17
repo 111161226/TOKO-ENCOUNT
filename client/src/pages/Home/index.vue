@@ -14,8 +14,9 @@ onMounted(async () => {
 
 <template>
   <div class="chat-list-container">
-    <div v-for="(room, index) in chatRooms" :key="room.roomId">
-      <hr v-if="index !== 0" class="line" />
+    <div class="title">Chats</div>
+    <div v-for="room in chatRooms" :key="room.roomId">
+      <hr class="line" />
       <div class="room" @click="$router.push(`/chat/${room.roomId}`)">
         <div class="room-left">
           <div class="room-name">{{ room.name || 'Unknown' }}</div>
@@ -43,6 +44,11 @@ onMounted(async () => {
   flex-direction: column;
   overflow-y: scroll;
   padding: 2rem;
+}
+.title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  padding: 0.5rem;
 }
 .line {
   border: 1px solid $bgcolor-primary;
