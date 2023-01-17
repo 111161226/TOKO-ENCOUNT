@@ -79,7 +79,7 @@ func (ci *chatInfra) CreateChat(destinationId string, post_user_id string) (*mod
 	post_user_name := ""
 	//create first message
 	err := ci.db.Get(
-		&post_user_id,
+		&post_user_name,
 		"SELECT user_name FROM users WHERE user_id = ?",
 		post_user_id,
 	)
