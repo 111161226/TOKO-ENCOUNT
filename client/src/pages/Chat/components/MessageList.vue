@@ -4,16 +4,19 @@ import { ref, watchEffect, onMounted, computed } from 'vue'
 import { ElLoading } from 'element-plus'
 import { Message } from '@/lib/apis'
 import { showErrorMessage } from '@/util/showErrorMessage'
+import { useMe } from '@/store/me'
 import { useMessages } from '@/store/message'
 
 const props = defineProps<{
   roomId: string
   messages: Message[]
-  myUserName: string | undefined
+  showUserName: boolean
 }>()
 
+const meStore = useMe()
 const messageStore = useMessages()
 
+const myUserId = computed(() => meStore.getMe?.userId)
 const hasNext = computed(() => messageStore.getMessage(props.roomId).hasNext)
 const loading = computed(() => messageStore.getLoading())
 
@@ -76,13 +79,22 @@ onMounted(async () => {
           messagesEle[index] = el as HTMLDivElement
         }
       "
-      :class="{
-        message: true,
-        'my-message': message.userName === myUserName,
-        'other-message': message.userName !== myUserName
-      }"
     >
-      {{ message.post }}
+      <div
+        v-if="showUserName && message.postUserId !== myUserId"
+        class="user-name"
+      >
+        {{ message.userName }}
+      </div>
+      <div
+        class="message"
+        :class="[
+          message.postUserId === myUserId ? 'my-message' : 'other-message',
+          showUserName ? 'show-user-name' : ''
+        ]"
+      >
+        {{ message.post }}
+      </div>
     </div>
     <div v-if="hasNext" ref="loadingEle" class="loading" />
   </div>
@@ -97,19 +109,30 @@ onMounted(async () => {
   white-space: pre-wrap;
   padding: 0.5rem 1rem;
   margin: 0.5rem 0;
-}
-.my-message {
-  align-self: flex-end;
-  background-color: $color-primary;
-  color: white;
   border-radius: 8px;
-  border-bottom-right-radius: 0;
+  width: fit-content;
+  max-width: 80%;
+
+  &.show-user-name {
+    margin-top: 0.25rem;
+  }
+
+  &.my-message {
+    align-self: flex-end;
+    background-color: $color-primary;
+    color: white;
+    border-bottom-right-radius: 0;
+  }
+
+  &.other-message {
+    align-self: flex-start;
+    background-color: $bgcolor-primary;
+    border-bottom-left-radius: 0;
+  }
 }
-.other-message {
-  align-self: flex-start;
-  background-color: $bgcolor-primary;
-  border-radius: 8px;
-  border-bottom-left-radius: 0;
+
+.user-name {
+  margin-top: 0.5rem;
 }
 
 .loading {

@@ -16,7 +16,6 @@ const messageStore = useMessages()
 const route = useRoute()
 const roomId = route.params.id as string
 
-const myUserName = ref(storeMe.getMe?.userName)
 const otherUserName = ref('')
 const messages = computed(() => messageStore.getMessage(roomId).messages)
 const contentDivRef = ref<HTMLDivElement>()
@@ -39,10 +38,14 @@ onMounted(async () => {
     messageStore.setLoading(true)
     await messageStore.fetchData(roomId, 20)
 
-    for (const message of messages.value) {
-      if (message.userName !== myUserName.value) {
-        otherUserName.value = message.userName
-        break
+    if (roomId == '0') {
+      otherUserName.value = '全体チャット'
+    } else {
+      for (const message of messages.value) {
+        if (message.postUserId !== storeMe.getMe?.userId) {
+          otherUserName.value = message.userName
+          break
+        }
       }
     }
   } catch (e: any) {
@@ -68,7 +71,7 @@ onMounted(async () => {
       <message-list
         :room-id="roomId"
         :messages="messages"
-        :my-user-name="myUserName"
+        :show-user-name="roomId === '0'"
       />
     </div>
     <div class="input-container">
