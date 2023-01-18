@@ -11,7 +11,7 @@ interface EventData {
   }
 }
 
-const ENTRY_POINT = 'ws://localhost:3050/ws'
+const ENTRY_POINT = 'ws://localhost:3050/api/ws'
 
 export const useWebSocket = defineStore('websocket', {
   state: (): { socket: WebSocket | undefined } => ({
