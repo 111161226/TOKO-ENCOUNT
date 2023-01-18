@@ -40,6 +40,7 @@ func main() {
 		api.GET("/chat/:rid", h.GetMessages)
 		api.POST("/chat", h.CreateChat)
 		api.POST("/login", h.Login)
+		api.GET("/user", h.SearchUser)
 		api.POST("/user", h.SignUp)
 		api.GET("/user/me", h.GetMyUser)
 		api.PATCH("/user/me", h.EditProfile)
