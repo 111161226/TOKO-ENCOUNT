@@ -38,7 +38,7 @@ type ChatList struct {
 
 //struct for user's own room
 type ChatUser struct {
-	RoomId    string    `json:"RoomId" db:"room_id"`
+	RoomId    string    `json:"roomId" db:"room_id"`
 	UserId    string    `json:"userId" db:"user_id"`	
 }
 

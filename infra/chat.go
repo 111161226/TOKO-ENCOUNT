@@ -157,7 +157,7 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 		}
 	}
 	ids = append(ids, userId) // 自分のユーザー名も欲しい
-	query, args, err := sqlx.In("SELECT * FROM `users` WHERE `user_id` IN (?)", ids)
+	query, args, err := sqlx.In("SELECT `user_id`, `user_name`, `prefect`, `gender` FROM `users` WHERE `user_id` IN (?)", ids)
 	if err != nil {
 		return nil, err
 	}
@@ -197,7 +197,7 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 	count := 0
 	err = ci.db.Get(
 		&count,
-		"SELECT COUNT(*) FROM `room_data` WHERE `user_id` = ? GROUP BY `user_id`",
+		"SELECT COUNT(*) FROM `room_datas` WHERE `user_id` = ? GROUP BY `user_id`",
 		userId,
 	)
 
@@ -213,7 +213,7 @@ func (ci *chatInfra) GetChatByRoomId(roomId string) (*model.ChatUserList, error)
 	users := []*model.ChatUser{}
 	err := ci.db.Select(
 		&users,
-		"SELECT `room_id`, `user_id` FROM room_datas WHRER room_id = ?",
+		"SELECT room_id, user_id FROM room_datas WHERE room_id = ?",
 		roomId,
 	)
 	if err != nil {
