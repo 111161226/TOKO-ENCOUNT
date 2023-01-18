@@ -118,7 +118,7 @@ onMounted(async () => {
   }
 
   &.my-message {
-    align-self: flex-end;
+    margin-left: auto;
     background-color: $color-primary;
     color: white;
     border-bottom-right-radius: 0;
