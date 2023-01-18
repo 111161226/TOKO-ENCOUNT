@@ -17,6 +17,10 @@ func (h *Handler) ChatPost(c echo.Context) error {
 	}
 	rid := c.Param("rid")
 	did := c.QueryParam("did")
+	if did == "" {
+		did = "0"
+	}
+
 	post := &model.MessageSimple{}
 	err = validatedBind(c, post)
 	if err != nil {
