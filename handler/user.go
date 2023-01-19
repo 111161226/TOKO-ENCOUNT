@@ -2,10 +2,25 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/cs-sysimpl/SakataKintoki/db/model"
 	"github.com/labstack/echo/v4"
 )
+
+func (h *Handler) Logout(c echo.Context) error {
+	sess, err := h.PickSession(c)
+	if err != nil {
+		return err
+	}
+
+	err = h.si.DeleteSessionBySessionId(sess.SessionId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.NoContent(http.StatusOK)
+}
 
 func (h *Handler) Login(c echo.Context) error {
 	//入力取得
@@ -104,4 +119,37 @@ func (h *Handler) GetMyUser(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, user)
+}
+
+func (h *Handler) SearchUser(c echo.Context) error {
+	//入力取得
+	l := c.QueryParam("limit")
+	if l == "" {
+		l = "20"
+	}
+	limit, err := strconv.Atoi(l)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	o := c.QueryParam("offset")
+	if o == "" {
+		o = "0"
+	}
+	offset, err := strconv.Atoi(o)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	name := c.QueryParam("name")
+	gender := c.QueryParam("gender")
+	prefect := c.QueryParam("prefect")
+
+	//対象となるユーザ取得
+	userlist, err := h.ui.GetUserList(limit, offset, name, gender, prefect)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, userlist)
 }
