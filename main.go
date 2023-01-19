@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/cs-sysimpl/SakataKintoki/handler"
-	mid "github.com/cs-sysimpl/SakataKintoki/middleware" 
+	mid "github.com/cs-sysimpl/SakataKintoki/middleware"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
@@ -38,11 +38,12 @@ func main() {
 		api.GET("/ping", h.Ping)
 
 		api.GET("/ws", h.GetWebSocket)
+		api.POST("/logout", h.Logout)
 		api.GET("/user", h.SearchUser)
 		api.POST("/user", h.SignUp)
 		api.GET("/user/me", h.GetMyUser)
 		api.PATCH("/user/me", h.EditProfile)
-		
+
 		apiChat := api.Group("/chat")
 		{
 			apiChat.GET("/", h.GetChatList)
