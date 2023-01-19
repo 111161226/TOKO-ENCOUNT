@@ -159,3 +159,66 @@ func (ui *userInfra) CheckUsedUserName(userName string) (*model.UserWithoutPass,
 	// 重複している場合はuser!=nil
 	return &user, nil
 }
+
+func (ui *userInfra) GetUserList(limit int, offset int, name string, gender string, prefect string) (*model.UserList, error) {
+	//クエリ文作成
+	query := ""
+	query1 := "SELECT `user_id`, `user_name`, `prefect`, `gender` FROM `users` "
+	query2 := "SELECT COUNT(*) FROM `users` "
+	bind := []interface{}{}
+	first := 1
+	if name != ""{
+		query += "WHERE `user_name` LIKE ? "
+	    first = 0
+	    bind = append(bind, "%"+name+"%")
+	}
+	
+	if gender != "" {
+		if first==0{
+	        query += "AND "
+	    } else {
+	        query += "WHERE "
+	        first = 0
+	    }
+	    query += "`gender` = ? "
+	    bind = append(bind, gender)
+	}
+	
+	if prefect != "" {
+	    if first==0{
+	        query += "AND "
+	    } else {
+	        query += "WHERE "
+	        first = 0
+	    }
+		query += "`prefect` = ? "
+		bind = append(bind, prefect)
+	}
+	
+	//対象となるユーザを取得
+	query1 = query1 + query + "LIMIT ? OFFSET ? "
+	bind1 := append(bind, limit, offset)
+	var users []*model.UserWithoutPass
+	err := ui.db.Select(
+	    &users,
+	    query1,
+	    bind1...,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	//対象となるユーザの全数を取得
+	query2 = query2 + query
+	var count int
+	err = ui.db.Get(
+	    &count,
+	    query2,
+	    bind...,
+	)
+
+	return &model.UserList{
+		HasNext: count > len(users) + offset,
+		Users: &users,
+	}, nil
+}

@@ -32,7 +32,7 @@ CREATE TABLE `chats` (
 
 -- db for room data
 DROP TABLE IF EXISTS `room_datas`;
-CREATE TABLE `room_data` (
+CREATE TABLE `room_datas` (
   `room_id` VARCHAR(37) NOT NULL,
   `user_id` VARCHAR(37) NOT NULL,
   `latest_access` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
