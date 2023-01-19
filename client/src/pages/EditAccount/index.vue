@@ -63,14 +63,15 @@ const confirmUpdate = async () => {
 
 <template>
   <div class="change-user-name-container">
+    <div class="title">Profile</div>
     <el-form
       ref="formRef"
       :model="inputData"
       :rules="rules"
-      label-position="left"
+      label-position="top"
     >
       <el-form-item prop="userName" label="ユーザー名">
-        <el-input v-model="inputData.userName" />
+        <el-input v-model="inputData.userName" maxlength="30" show-word-limit/>
       </el-form-item>
       <el-form-item prop="gender" label="性別">
         <el-select
@@ -110,6 +111,7 @@ const confirmUpdate = async () => {
 
     <el-button
       type="primary"
+      class="button"
       :loading="loading"
       :disabled="!isFormValid"
       @click="confirmUpdate"
@@ -121,6 +123,25 @@ const confirmUpdate = async () => {
 
 <style lang="scss" scoped>
 .change-user-name-container {
-  padding: 10px 5px;
+  max-width: 600px;
+  width: 80%;
+  margin: 0 auto;
+  padding: 40px 30px;
+
+  .title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+}
+
+
+.button {
+  background-color: $color-primary;
+  color: white;
+  border-radius: 0.5rem;
+  width: 100%;
+
 }
 </style>

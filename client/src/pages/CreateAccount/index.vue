@@ -68,7 +68,7 @@ const confirmCreate = async () => {
       ref="formRef"
       :model="inputData"
       :rules="rules"
-      label-position="left"
+      label-position="top"
     >
       <el-form-item prop="userName" label="ユーザー名">
         <el-input v-model="inputData.userName" maxlength="30" show-word-limit />
@@ -83,7 +83,6 @@ const confirmCreate = async () => {
           @keyup.enter="confirmCreate"
         />
       </el-form-item>
-      <div style="display:inline-flex">
       <el-form-item prop="gender" label="性別">
         <el-select
           v-model="inputData.gender"
@@ -92,6 +91,7 @@ const confirmCreate = async () => {
           <el-option label="female" value="female" />
         </el-select>
       </el-form-item>
+
       <el-form-item prop="prefect" label="都道府県">
         <el-select v-model="inputData.prefect" > 
           <el-option
@@ -102,27 +102,28 @@ const confirmCreate = async () => {
           />
         </el-select>
       </el-form-item>
-      </div>
     </el-form>
-    <div class="button">
+    <div>
     <el-button
       type="primary"
+      class="button"
       :loading="loading"
       :disabled="!isFormValid"
       @click="confirmCreate"
     >
-      作成
+      アカウント作成
     </el-button>
-  </div>
+    </div>
     <div class="bottom-nav">
-      <router-link :to="{ name: 'Login' }">ログイン</router-link>
+      <router-link :to="{ name: 'Login' }" class="link">ログイン</router-link>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
 .create-user-container {
-  width: 35%;
+  max-width: 600px;
+  width: 80%;
   margin: 0 auto;
   padding: 40px 30px;
 
@@ -132,6 +133,26 @@ const confirmCreate = async () => {
     margin-bottom: 20px;
     text-align: center;
   }
+
+
+  .bottom-nav {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 30px;
+  }
+
+  .link{
+    transition: color 0.2s;
+    &:hover {
+      color: $color-secondary;
+    }
+  }
   
+}
+.button {
+  background-color: $color-primary;
+  color: white;
+  border-radius: 0.5rem;
+  width: 100%;
 }
 </style>
