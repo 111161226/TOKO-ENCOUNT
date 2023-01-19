@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { useDraftMessages } from '@/store/draftMessage.js'
 import { onMounted, ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useDraftMessages } from '@/store/draftMessage'
 
 const draftMessageStore = useDraftMessages()
 const route = useRoute()
