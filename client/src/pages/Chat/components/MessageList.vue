@@ -62,7 +62,7 @@ watchEffect(onCleanup => {
   onCleanup(() => observer.disconnect())
 })
 
-onMounted(async () => {
+onMounted(() => {
   if (loadingEle.value) {
     ElLoading.service({ target: loadingEle.value })
   }
