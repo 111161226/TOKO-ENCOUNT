@@ -1,58 +1,63 @@
 <script lang="ts" setup>
-import apis, { Message } from '@/lib/apis'
+import { AxiosError } from 'axios'
+import { onMounted, ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useMe } from '@/store/me'
 import { useMessages } from '@/store/message'
+import { useDraftMessages } from '@/store/draftMessage'
 import { showErrorMessage } from '@/util/showErrorMessage'
-import { AxiosError } from 'axios'
-import { nextTick, onMounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
 import ChatInput from './components/ChatInput.vue'
 import MessageList from './components/MessageList.vue'
 
 const storeMe = useMe()
-const storeMessages = useMessages()
+const draftMessageStore = useDraftMessages()
+const messageStore = useMessages()
 
 const route = useRoute()
 const roomId = route.params.id as string
 
-const myUserName = ref(storeMe.getMe?.userName)
 const otherUserName = ref('')
-const messages = ref<Message[]>([])
+const messages = computed(() => messageStore.getMessage(roomId).messages)
 const contentDivRef = ref<HTMLDivElement>()
 
 const onSubmit = async () => {
-  const message = storeMessages.getMessage(roomId)
+  const message = draftMessageStore.getMessage(roomId)
   if (message) {
-    const { data } = await apis.postChat(roomId, { post: message })
-    storeMessages.setMessage(roomId, '')
-    messages.value?.push(data)
+    try {
+      await messageStore.sendMessage(roomId, message)
+      draftMessageStore.setMessage(roomId, '')
+    } catch (e: any) {
+      const err: AxiosError = e
+      showErrorMessage(err)
+    }
   }
 }
 
-watch(
-  messages,
-  async () => {
-    // scroll to bottom
-    await nextTick()
-    contentDivRef.value?.scrollTo(0, contentDivRef.value.scrollHeight)
-  },
-  { deep: true }
-)
-
 onMounted(async () => {
   try {
-    const { data } = await apis.getChatMessages(roomId)
-    messages.value = data.messages
+    messageStore.setLoading(true)
+    await messageStore.fetchData(roomId, 20)
 
-    for (const message of messages.value) {
-      if (message.userName !== myUserName.value) {
-        otherUserName.value = message.userName
-        break
+    if (roomId == '0') {
+      otherUserName.value = '全体チャット'
+    } else {
+      for (const message of messages.value) {
+        if (message.postUserId !== storeMe.getMe?.userId) {
+          otherUserName.value = message.userName
+          break
+        }
       }
     }
   } catch (e: any) {
     const err: AxiosError = e
     showErrorMessage(err)
+  } finally {
+    messageStore.setLoading(false)
+  }
+
+  if (contentDivRef.value) {
+    // scroll to bottom
+    contentDivRef.value?.scrollTo(0, contentDivRef.value.scrollHeight)
   }
 })
 </script>
@@ -63,7 +68,11 @@ onMounted(async () => {
       {{ otherUserName }}
     </div>
     <div class="content" ref="contentDivRef">
-      <message-list :messages="messages" :my-user-name="myUserName" />
+      <message-list
+        :room-id="roomId"
+        :messages="messages"
+        :show-user-name="roomId === '0'"
+      />
     </div>
     <div class="input-container">
       <chat-input class="input" />

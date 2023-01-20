@@ -11,7 +11,7 @@ type MessageSimple struct {
 type Message struct {
 	Post      string    `json:"post" db:"post"`
 	ChatId    string    `json:"chatId" db:"chat_id"`
-	UserId    string    `json:"userId" db:"post_user_id"`
+	UserId    string    `json:"postUserId" db:"post_user_id"`
 	UserName  string    `json:"userName" db:"user_name"`
 	CreatedAt time.Time `json:"createdAt" db:"created_at"`
 }
@@ -38,8 +38,8 @@ type ChatList struct {
 
 //struct for user's own room
 type ChatUser struct {
-	RoomId    string    `json:"roomId" db:"room_id"`
-	UserId    string    `json:"userId" db:"user_id"`	
+	RoomId string `json:"roomId" db:"room_id"`
+	UserId string `json:"userId" db:"user_id"`
 }
 
 //struct for user's all own room

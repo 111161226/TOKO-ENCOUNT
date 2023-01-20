@@ -1,22 +1,22 @@
 <script lang="ts" setup>
-import { useMessages } from '@/store/message'
 import { onMounted, ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useDraftMessages } from '@/store/draftMessage'
 
-const messagesStore = useMessages()
+const draftMessageStore = useDraftMessages()
 const route = useRoute()
 
 const inputMessage = ref('')
 watch(inputMessage, newMessage => {
-  messagesStore.setMessage(roomId, newMessage)
+  draftMessageStore.setMessage(roomId, newMessage)
 })
 
 const roomId = route.params.id as string
-messagesStore.$subscribe((_, state) => {
+draftMessageStore.$subscribe((_, state) => {
   inputMessage.value = state.messages?.[roomId] ?? ''
 })
 onMounted(() => {
-  const storedMessage = computed(() => messagesStore.getMessage(roomId))
+  const storedMessage = computed(() => draftMessageStore.getMessage(roomId))
   inputMessage.value = storedMessage.value ?? ''
 })
 </script>
