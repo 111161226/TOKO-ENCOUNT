@@ -223,3 +223,29 @@ func (ci *chatInfra) GetChatByRoomId(roomId string) (*model.ChatUserList, error)
 		ChatUsers: &users,
 	}, nil
 }
+
+func (ci *chatInfra) AddOpenChat(userId string) error {
+	_, err := ci.db.Exec(
+		"INSERT INTO `room_datas` (`room_id`, `user_id`) VALUES (0, ?)",
+		userId,
+	)
+	return err
+}
+
+func (ci *chatInfra) ResetNotRead(roomId string, userId string) error {
+	_, err := ci.db.Exec(
+		"UPDATE `room_datas` SET `not_read` = 0, `latest_access` = CURRENT_TIMESTAMP WHERE `room_id` = ? AND `user_id` = ?",
+		roomId,
+		userId,
+	)
+	return err
+}
+
+func (ci *chatInfra) IncrementNotRead(roomId string, userId string) error {
+	_, err := ci.db.Exec(
+		"UPDATE `room_datas` SET `not_read` = `not_read` + 1 WHERE `room_id` = ? AND `user_id` != ?",
+		roomId,
+		userId,
+	)
+	return err
+}

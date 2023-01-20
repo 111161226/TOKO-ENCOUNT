@@ -8,4 +8,8 @@ type ChatRepository interface {
 	CreateChat(destinationId string, post_user_id string) (*model.Message, error)
 	GetChatList(userId string, limit int, offset int) (*model.ChatList, error)
 	GetChatByRoomId(roomId string) (*model.ChatUserList, error)
+	AddOpenChat(userId string) error
+	ResetNotRead(roomId string, userId string) error
+	/** roomId に参加している userId 以外の全ユーザーの未読数をインクリメントする */
+	IncrementNotRead(roomId string, userId string) error
 }
