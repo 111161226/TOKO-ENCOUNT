@@ -29,7 +29,7 @@ func main() {
 	}))
 
 	e.File("/api/swagger.yaml", "./docs/swagger.yaml")
-	e.Static("/api", "./docs/swagger-ui/dist")
+	e.Static("/api/swagger-ui", "./docs/swagger-ui/dist")
 
 	e.POST("/api/login", h.Login)
 

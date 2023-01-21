@@ -33,4 +33,5 @@ RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSI
  && rm dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 COPY --from=client-build /github.com/cs-sysimpl/SakataKintoki/client/dist ./web/dist
 COPY --from=server-build /go/src/github.com/cs-sysimpl/SakataKintoki ./
+COPY --from=server-build /docs/swagger-ui/dist ./docs/swagger-ui/dist
 ENTRYPOINT ./SakataKintoki
