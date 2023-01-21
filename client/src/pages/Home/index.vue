@@ -29,7 +29,7 @@ onMounted(async () => {
           >
             {{ room.newMessageCount }}
           </div>
-          <div class="created-at">
+          <div>
             {{ getRelativeTime(room.latestMessage.createdAt) }}
           </div>
         </div>
