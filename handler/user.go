@@ -72,6 +72,11 @@ func (h *Handler) SignUp(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
+	err = h.ci.AddOpenChat(user.UserId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
 	err = createSessionAndSetCookie(c, h, user.UserId)
 	if err != nil {
 		return err

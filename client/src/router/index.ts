@@ -120,7 +120,6 @@ router.beforeEach(async (to: IRoute, _, next) => {
           next()
         } else {
           showErrorMessage(err)
-          next({ name: 'Login' })
         }
         return
       }

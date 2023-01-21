@@ -37,6 +37,11 @@ func (h *Handler) ChatPost(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
+	err = h.ci.IncrementNotRead(rid, sess.UserId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
 	return c.JSON(http.StatusOK, postedMessage)
 }
 
@@ -74,6 +79,15 @@ func (h *Handler) GetMessages(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	message, err := h.ci.GetMessages(rid, limit, offset)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	sess, err := h.PickSession(c)
+	if err != nil {
+		return err
+	}
+	err = h.ci.ResetNotRead(rid, sess.UserId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

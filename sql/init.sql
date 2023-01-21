@@ -35,7 +35,7 @@ DROP TABLE IF EXISTS `room_datas`;
 CREATE TABLE `room_datas` (
   `room_id` VARCHAR(37) NOT NULL,
   `user_id` VARCHAR(37) NOT NULL,
-  `latest_access` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `latest_access` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `not_read` BIGINT(100) NOT NULL DEFAULT 0,
   PRIMARY KEY (`room_id`, `user_id`)
 );

@@ -167,42 +167,42 @@ func (ui *userInfra) GetUserList(limit int, offset int, name string, gender stri
 	query2 := "SELECT COUNT(*) FROM `users` "
 	bind := []interface{}{}
 	first := 1
-	if name != ""{
+	if name != "" {
 		query += "WHERE `user_name` LIKE ? "
-	    first = 0
-	    bind = append(bind, "%"+name+"%")
+		first = 0
+		bind = append(bind, "%"+name+"%")
 	}
-	
+
 	if gender != "" {
-		if first==0{
-	        query += "AND "
-	    } else {
-	        query += "WHERE "
-	        first = 0
-	    }
-	    query += "`gender` = ? "
-	    bind = append(bind, gender)
+		if first == 0 {
+			query += "AND "
+		} else {
+			query += "WHERE "
+			first = 0
+		}
+		query += "`gender` = ? "
+		bind = append(bind, gender)
 	}
-	
+
 	if prefect != "" {
-	    if first==0{
-	        query += "AND "
-	    } else {
-	        query += "WHERE "
-	        first = 0
-	    }
+		if first == 0 {
+			query += "AND "
+		} else {
+			query += "WHERE "
+			first = 0
+		}
 		query += "`prefect` = ? "
 		bind = append(bind, prefect)
 	}
-	
+
 	//対象となるユーザを取得
 	query1 = query1 + query + "LIMIT ? OFFSET ? "
 	bind1 := append(bind, limit, offset)
-	var users []*model.UserWithoutPass
+	users := []*model.UserWithoutPass{}
 	err := ui.db.Select(
-	    &users,
-	    query1,
-	    bind1...,
+		&users,
+		query1,
+		bind1...,
 	)
 	if err != nil {
 		return nil, err
@@ -212,13 +212,13 @@ func (ui *userInfra) GetUserList(limit int, offset int, name string, gender stri
 	query2 = query2 + query
 	var count int
 	err = ui.db.Get(
-	    &count,
-	    query2,
-	    bind...,
+		&count,
+		query2,
+		bind...,
 	)
 
 	return &model.UserList{
-		HasNext: count > len(users) + offset,
-		Users: &users,
+		HasNext: count > len(users)+offset,
+		Users:   &users,
 	}, nil
 }

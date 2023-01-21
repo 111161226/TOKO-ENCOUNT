@@ -39,9 +39,8 @@ func (ci *chatInfra) PostChat(roomId string, destinationId string, message *mode
 	mess := model.Message{}
 	err = ci.db.Get(
 		&mess,
-		"SELECT post, chat_id, post_user_id, user_name, created_at FROM chats INNER JOIN users ON post_user_id = user_id WHERE room_id = ? AND post_user_id = ? ORDER BY `created_at` DESC",
-		roomId,
-		post_user_id,
+		"SELECT `post`, `chat_id`, `post_user_id`, `user_name`, `created_at` FROM `chats` INNER JOIN `users` ON `post_user_id` = `user_id` AND `chat_id` = ?",
+		chatId,
 	)
 
 	//return posting message
@@ -121,7 +120,7 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 	// 自分が参加しているルームとその最新メッセージを取得
 	err := ci.db.Select(
 		&messages,
-		"SELECT `chat`.`post`, `chat`.`chat_id`, `chat`.`post_user_id`, `chat`.`created_at`, `chat`.`destination_user_id`, `room`.`room_id`, `room`.`not_read` FROM `room_datas` as `room` INNER JOIN (SELECT * FROM `chats` GROUP BY `room_id` ORDER BY `created_at` DESC LIMIT 1) as `chat` ON `room`.`room_id` = `chat`.`room_id` AND `room`.`user_id` = ? ORDER BY `chat`.`created_at` DESC LIMIT ? OFFSET ?",
+		"SELECT `chat`.`post`, `chat`.`chat_id`, `chat`.`post_user_id`, `chat`.`created_at`, `chat`.`destination_user_id`, `room`.`room_id`, `room`.`not_read` FROM (SELECT * FROM (SELECT `chat_id`, `room_id`, `destination_user_id`, `post`, `post_user_id`, `created_at`, ROW_NUMBER() OVER(PARTITION BY `room_id` ORDER BY `created_at` DESC) AS `row_num` FROM `chats`) AS `c` WHERE `row_num` = 1) AS `chat` INNER JOIN (SELECT * FROM `room_datas` WHERE `user_id` = ?) AS `room` ON `room`.`room_id` = `chat`.`room_id` ORDER BY `chat`.`created_at` DESC LIMIT ? OFFSET ?",
 		userId,
 		limit,
 		offset,
@@ -182,7 +181,6 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 		} else if m.UserId == userId {
 			// 最新メッセージが自分が送ったものの場合
 			name = idNameMap[m.DestinationUserId]
-
 		}
 		c := &model.ChatData{
 			RoomId:          m.RoomId,
@@ -222,4 +220,30 @@ func (ci *chatInfra) GetChatByRoomId(roomId string) (*model.ChatUserList, error)
 	return &model.ChatUserList{
 		ChatUsers: &users,
 	}, nil
+}
+
+func (ci *chatInfra) AddOpenChat(userId string) error {
+	_, err := ci.db.Exec(
+		"INSERT INTO `room_datas` (`room_id`, `user_id`) VALUES (0, ?)",
+		userId,
+	)
+	return err
+}
+
+func (ci *chatInfra) ResetNotRead(roomId string, userId string) error {
+	_, err := ci.db.Exec(
+		"UPDATE `room_datas` SET `not_read` = 0, `latest_access` = CURRENT_TIMESTAMP WHERE `room_id` = ? AND `user_id` = ?",
+		roomId,
+		userId,
+	)
+	return err
+}
+
+func (ci *chatInfra) IncrementNotRead(roomId string, userId string) error {
+	_, err := ci.db.Exec(
+		"UPDATE `room_datas` SET `not_read` = `not_read` + 1 WHERE `room_id` = ? AND `user_id` != ?",
+		roomId,
+		userId,
+	)
+	return err
 }
