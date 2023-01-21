@@ -120,6 +120,7 @@ const login = async () => {
   .link{
     color: $color-primary;
     transition: color 0.2s;
+    text-decoration: none;
     &:hover {
       color: $color-secondary;
       text-decoration: underline;
