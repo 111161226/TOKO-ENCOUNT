@@ -1,21 +1,74 @@
 <script lang="ts" setup>
-import apis, { ChatData } from '@/lib/apis'
-import { onMounted, ref } from 'vue'
-import { getRelativeTime, compareFunc } from './time'
+import { useChatRooms } from '@/store/chatRoom'
+import { showErrorMessage } from '@/util/showErrorMessage'
+import { AxiosError } from 'axios'
+import { ElLoading } from 'element-plus'
+import { computed, onMounted, ref, watchEffect } from 'vue'
+import { getRelativeTime } from './time'
 
-const chatRooms = ref<ChatData[]>()
+const chatRoomStore = useChatRooms()
+
+const chatRooms = computed(() => chatRoomStore.getChatList.chats)
+const hasNext = computed(() => chatRoomStore.getChatList.hasNext)
+const loading = computed(() => chatRoomStore.getLoading)
+
+const loadingEle = ref<HTMLDivElement>()
+const chatRoomsEle = ref<HTMLDivElement[]>([])
+
+const fetchData = async () => {
+  try {
+    chatRoomStore.setLoading(true)
+    await chatRoomStore.fetchData(20)
+  } catch (e: any) {
+    const err: AxiosError = e
+    showErrorMessage(err)
+  } finally {
+    chatRoomStore.setLoading(false)
+  }
+}
+
+watchEffect(onCleanup => {
+  const { value } = loadingEle
+  if (!value || !hasNext.value || loading.value) return
+
+  const observer = new IntersectionObserver(
+    async entries => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) {
+          return
+        }
+      }
+      await fetchData()
+    },
+    { threshold: 0.5 }
+  )
+  observer.observe(value)
+
+  onCleanup(() => {
+    observer.disconnect()
+  })
+})
 
 onMounted(async () => {
-  const { data } = await apis.getChat()
-  chatRooms.value = data.chats
-  chatRooms.value.sort(compareFunc)
+  await fetchData()
+  if (loadingEle.value) {
+    ElLoading.service({ target: loadingEle.value })
+  }
 })
 </script>
 
 <template>
   <div class="chat-list-container">
     <div class="title">Chats</div>
-    <div v-for="room in chatRooms" :key="room.roomId">
+    <div
+      v-for="(room, index) in chatRooms"
+      :key="room.roomId"
+      :ref="
+        el => {
+          chatRoomsEle[index] = el as HTMLDivElement
+        }
+      "
+    >
       <hr class="line" />
       <div class="room" @click="$router.push(`/chat/${room.roomId}`)">
         <div class="room-left">
@@ -35,6 +88,7 @@ onMounted(async () => {
         </div>
       </div>
     </div>
+    <div v-if="hasNext" ref="loadingEle" class="loading" />
   </div>
 </template>
 
@@ -86,5 +140,8 @@ onMounted(async () => {
   .hidden {
     visibility: hidden;
   }
+}
+.loading {
+  height: 3rem;
 }
 </style>
