@@ -142,6 +142,9 @@ const confirmUpdate = async () => {
   color: white;
   border-radius: 0.5rem;
   width: 100%;
-
+  border: none;
+  &:hover {
+    background-color: $color-secondary;
+  }
 }
 </style>
