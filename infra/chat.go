@@ -39,9 +39,8 @@ func (ci *chatInfra) PostChat(roomId string, destinationId string, message *mode
 	mess := model.Message{}
 	err = ci.db.Get(
 		&mess,
-		"SELECT post, chat_id, post_user_id, user_name, created_at FROM chats INNER JOIN users ON post_user_id = user_id WHERE room_id = ? AND post_user_id = ? ORDER BY `created_at` DESC",
-		roomId,
-		post_user_id,
+		"SELECT `post`, `chat_id`, `post_user_id`, `user_name`, `created_at` FROM `chats` INNER JOIN `users` ON `post_user_id` = `user_id` AND `chat_id` = ?",
+		chatId,
 	)
 
 	//return posting message
