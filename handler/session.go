@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
@@ -11,6 +12,10 @@ import (
 func (h *Handler) PickSession(c echo.Context) (*model.Session, error) {
 	cookie, err := c.Cookie("session_id")
 	if err != nil {
+		if errors.Is(err, http.ErrNoCookie) {
+			return nil, echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+		}
+
 		return nil, echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
