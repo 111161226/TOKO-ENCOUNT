@@ -121,7 +121,7 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 	// 自分が参加しているルームとその最新メッセージを取得
 	err := ci.db.Select(
 		&messages,
-		"SELECT `chat`.`post`, `chat`.`chat_id`, `chat`.`post_user_id`, `chat`.`created_at`, `chat`.`destination_user_id`, `room`.`room_id`, `room`.`not_read` FROM `room_datas` as `room` INNER JOIN (SELECT * FROM `chats` GROUP BY `room_id` ORDER BY `created_at` DESC LIMIT 1) as `chat` ON `room`.`room_id` = `chat`.`room_id` AND `room`.`user_id` = ? ORDER BY `chat`.`created_at` DESC LIMIT ? OFFSET ?",
+		"SELECT `chat`.`post`, `chat`.`chat_id`, `chat`.`post_user_id`, `chat`.`created_at`, `chat`.`destination_user_id`, `room`.`room_id`, `room`.`not_read` FROM (SELECT * FROM (SELECT `chat_id`, `room_id`, `destination_user_id`, `post`, `post_user_id`, `created_at`, ROW_NUMBER() OVER(PARTITION BY `room_id` ORDER BY `created_at` DESC) AS `row_num` FROM `chats`) AS `c` WHERE `row_num` = 1) AS `chat` INNER JOIN (SELECT * FROM `room_datas` WHERE `user_id` = ?) AS `room` ON `room`.`room_id` = `chat`.`room_id` ORDER BY `chat`.`created_at` DESC LIMIT ? OFFSET ?",
 		userId,
 		limit,
 		offset,
@@ -182,7 +182,6 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 		} else if m.UserId == userId {
 			// 最新メッセージが自分が送ったものの場合
 			name = idNameMap[m.DestinationUserId]
-
 		}
 		c := &model.ChatData{
 			RoomId:          m.RoomId,
