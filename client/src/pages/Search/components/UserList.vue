@@ -1,27 +1,96 @@
 <script lang="ts" setup>
 import apis, { UserWithoutPass } from '@/lib/apis'
+import { useUsers } from '@/store/user'
 import { showErrorMessage } from '@/util/showErrorMessage'
 import { AxiosError } from 'axios'
-import { defineProps } from 'vue'
+import { ElLoading } from 'element-plus'
+import { computed, defineProps, onMounted, ref, watchEffect } from 'vue'
 
-defineProps<{
+const props = defineProps<{
   users: UserWithoutPass[]
+  searchQuery: {
+    name: string
+    gender: string
+    prefecture: string
+  }
 }>()
+
+const userStore = useUsers()
+
+const hasNext = computed(() => userStore.getUsers.hasNext)
+const loading = computed(() => userStore.getLoading)
+
+const loadingEle = ref<HTMLDivElement>()
+const usersEle = ref<HTMLDivElement[]>([])
 
 const onCreateRoom = async (userId: string) => {
   try {
     await apis.createChat(userId)
-    // TODO: router.push to chat page, currently can't get roomId of the created room
+    // TODO: router.push to /chat/{roomId}, currently can't get roomId of the created room
   } catch (e: any) {
     const err: AxiosError = e
     showErrorMessage(err)
   }
 }
+
+const fetchData = async () => {
+  try {
+    userStore.setLoading(true)
+    await userStore.fetchData(
+      30,
+      props.searchQuery.name,
+      props.searchQuery.gender,
+      props.searchQuery.prefecture
+    )
+  } catch (e: any) {
+    const err: AxiosError = e
+    showErrorMessage(err)
+  } finally {
+    userStore.setLoading(false)
+  }
+}
+
+watchEffect(onCleanup => {
+  const { value } = loadingEle
+  if (!value || !hasNext.value || loading.value) return
+
+  const observer = new IntersectionObserver(
+    async entries => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) {
+          return
+        }
+      }
+
+      await fetchData()
+    },
+    { threshold: 0.5 }
+  )
+  observer.observe(value)
+
+  onCleanup(() => {
+    observer.disconnect()
+  })
+})
+
+onMounted(() => {
+  if (loadingEle.value) {
+    ElLoading.service({ target: loadingEle.value })
+  }
+})
 </script>
 
 <template>
   <div class="user-list-container">
-    <div v-for="(user, index) in users" :key="user.userId">
+    <div
+      v-for="(user, index) in users"
+      :key="user.userId"
+      :ref="
+        el => {
+          usersEle[index] = el as HTMLDivElement
+        }
+      "
+    >
       <hr v-if="index !== 0" class="line" />
       <div class="user">
         <div class="user-left">
@@ -45,6 +114,7 @@ const onCreateRoom = async (userId: string) => {
         </div>
       </div>
     </div>
+    <div v-if="hasNext" ref="loadingEle" class="loading"></div>
   </div>
 </template>
 
@@ -93,5 +163,8 @@ const onCreateRoom = async (userId: string) => {
   &:hover {
     background-color: $color-secondary;
   }
+}
+.loading {
+  height: 3rem;
 }
 </style>

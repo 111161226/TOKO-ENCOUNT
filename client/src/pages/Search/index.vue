@@ -1,31 +1,36 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { prefectures } from '@/util/prefectures'
-import apis, { UserWithoutPass } from '@/lib/apis'
 import UserList from './components/UserList.vue'
 import { AxiosError } from 'axios'
 import { showErrorMessage } from '@/util/showErrorMessage'
+import { useUsers } from '@/store/user'
+
+const userStore = useUsers()
 
 const input = ref({
   name: '',
   gender: '',
   prefecture: ''
 })
-const result = ref<UserWithoutPass[]>([])
+
+const result = computed(() => userStore.getUsers.users)
 
 const onSearch = async () => {
   try {
-    const { data } = await apis.getUsers(
-      50,
-      0,
+    userStore.initializeUsers()
+    userStore.setLoading(true)
+    await userStore.fetchData(
+      30,
       input.value.name,
       input.value.gender,
       input.value.prefecture
     )
-    result.value = data.users
   } catch (e: any) {
     const err: AxiosError = e
     showErrorMessage(err)
+  } finally {
+    userStore.setLoading(false)
   }
 }
 </script>
@@ -62,7 +67,7 @@ const onSearch = async () => {
       </button>
     </div>
     <div class="content">
-      <user-list :users="result" />
+      <user-list :users="result" :search-query="input" />
     </div>
   </div>
 </template>
