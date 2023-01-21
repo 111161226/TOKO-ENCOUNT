@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"encoding/json"
-
 	"github.com/cs-sysimpl/SakataKintoki/db/model"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/net/websocket"
@@ -36,15 +34,11 @@ func (ws *webSocketPublisher) NotifyNewMessage(userIds []string, roomId string, 
 			Message: message,
 		},
 	}
-	bytes, err := json.Marshal(n)
-	if err != nil {
-		return err
-	}
 
 	if roomId == "0" { // 全体チャットの場合
 		for _, connections := range ws.userIdConnectionPool { // 全員に通知
 			for connection := range connections {
-				_, err = connection.Write(bytes)
+				err := websocket.JSON.Send(connection, n)
 				if err != nil {
 					return err
 				}
@@ -58,7 +52,7 @@ func (ws *webSocketPublisher) NotifyNewMessage(userIds []string, roomId string, 
 			}
 
 			for connection := range connections {
-				_, err = connection.Write(bytes)
+				err := websocket.JSON.Send(connection, n)
 				if err != nil {
 					return err
 				}
