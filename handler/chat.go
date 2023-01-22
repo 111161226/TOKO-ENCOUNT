@@ -57,12 +57,15 @@ func (h *Handler) CreateChat(c echo.Context) error {
 	if did == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, "`did` is required")
 	}
-	_, err = h.ui.GetUser(did)
+	u, err := h.ui.GetUser(did)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return echo.NewHTTPError(http.StatusBadRequest, "invalid `did`")
 		}
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	if u.UserId == sess.UserId {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid `did`")
 	}
 
 	roomData, err := h.ci.CreateChat(did, sess.UserId)

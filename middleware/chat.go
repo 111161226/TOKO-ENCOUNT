@@ -40,7 +40,7 @@ func EnsureExistChatAndHaveAccessRight(h *handler.Handler) echo.MiddlewareFunc {
 						correct = true
 					}
 
-					if did == user.UserId {
+					if did == user.UserId && did != sess.UserId {
 						validDid = true
 					}
 				}
