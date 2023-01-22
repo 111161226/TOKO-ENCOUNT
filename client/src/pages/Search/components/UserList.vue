@@ -21,7 +21,6 @@ const hasNext = computed(() => userStore.getUsers.hasNext)
 const loading = computed(() => userStore.getLoading)
 
 const loadingEle = ref<HTMLDivElement>()
-const usersEle = ref<HTMLDivElement[]>([])
 
 const onCreateRoom = async (userId: string) => {
   try {
@@ -82,15 +81,7 @@ onMounted(() => {
 
 <template>
   <div class="user-list-container">
-    <div
-      v-for="(user, index) in users"
-      :key="user.userId"
-      :ref="
-        el => {
-          usersEle[index] = el as HTMLDivElement
-        }
-      "
-    >
+    <div v-for="(user, index) in users" :key="user.userId">
       <hr v-if="index !== 0" class="line" />
       <div class="user">
         <div class="user-left">
