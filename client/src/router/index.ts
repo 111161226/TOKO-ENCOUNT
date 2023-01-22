@@ -46,7 +46,7 @@ export const sidebarRoutes: IRouteRecordRaw[] = [
   {
     path: '/profile',
     name: 'Profile',
-    component: {}, // TODO
+    component: () => import('@/pages/EditAccount/index.vue'),
     meta: { title: 'Profile' }
   }
 ]
@@ -73,6 +73,11 @@ const publicRoutes: IRouteRecordRaw[] = [
     path: '/login',
     name: 'Login',
     component: () => import('@/pages/Login/index.vue')
+  },
+  {
+    path: '/signup',
+    name: 'CreateAccount',
+    component: () => import('@/pages/CreateAccount/index.vue')
   },
   {
     path: '/:pathMatch(.*)',
