@@ -56,6 +56,11 @@ func (h *Handler) CreateChat(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
+	err = h.ws.NotifyNewMessage([]string{did}, roomData.RoomId, &roomData.LatestMessage)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
 	return c.JSON(http.StatusOK, roomData)
 }
 
