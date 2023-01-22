@@ -93,18 +93,25 @@ onMounted(async () => {
 .title {
   font-size: 1.75rem;
   font-weight: 600;
-  padding: 0.5rem;
+  padding: 1rem 0.5rem;
 }
 .line {
   border: 1px solid $bgcolor-primary;
   border-radius: 1px;
+  margin: 0;
 }
 .room {
   display: flex;
   justify-content: space-between;
-  padding: 0 0.5rem;
+  padding: 0.5rem;
+  margin: 0.2rem 0;
+  border-radius: 0.5rem;
   word-wrap: break-word;
   cursor: pointer;
+  transition: background-color 0.2s;
+  &:hover {
+    background-color: $bgcolor-primary;
+  }
 }
 .room-left {
   display: flex;
