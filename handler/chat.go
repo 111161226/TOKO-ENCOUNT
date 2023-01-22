@@ -51,12 +51,12 @@ func (h *Handler) CreateChat(c echo.Context) error {
 		return err
 	}
 	did := c.QueryParam("did")
-	message, err := h.ci.CreateChat(did, sess.UserId)
+	roomData, err := h.ci.CreateChat(did, sess.UserId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, message)
+	return c.JSON(http.StatusOK, roomData)
 }
 
 func (h *Handler) GetMessages(c echo.Context) error {

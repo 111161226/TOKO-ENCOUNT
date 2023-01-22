@@ -187,7 +187,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Message"
+                $ref: "#/components/schemas/ChatData"
 
   /api/chat/{rid}:
     get:
