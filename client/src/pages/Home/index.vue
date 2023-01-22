@@ -13,7 +13,6 @@ const hasNext = computed(() => chatRoomStore.getChatList.hasNext)
 const loading = computed(() => chatRoomStore.getLoading)
 
 const loadingEle = ref<HTMLDivElement>()
-const chatRoomsEle = ref<HTMLDivElement[]>([])
 
 const fetchData = async () => {
   try {
@@ -60,15 +59,7 @@ onMounted(async () => {
 <template>
   <div class="chat-list-container">
     <div class="title">Chats</div>
-    <div
-      v-for="(room, index) in chatRooms"
-      :key="room.roomId"
-      :ref="
-        el => {
-          chatRoomsEle[index] = el as HTMLDivElement
-        }
-      "
-    >
+    <div v-for="room in chatRooms" :key="room.roomId">
       <hr class="line" />
       <div class="room" @click="$router.push(`/chat/${room.roomId}`)">
         <div class="room-left">
