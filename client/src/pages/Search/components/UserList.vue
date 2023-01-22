@@ -5,6 +5,7 @@ import { showErrorMessage } from '@/util/showErrorMessage'
 import { AxiosError } from 'axios'
 import { ElLoading } from 'element-plus'
 import { computed, defineProps, onMounted, ref, watchEffect } from 'vue'
+import { useRouter } from 'vue-router'
 
 const props = defineProps<{
   users: UserWithoutPass[]
@@ -15,6 +16,7 @@ const props = defineProps<{
   }
 }>()
 
+const router = useRouter()
 const userStore = useUsers()
 
 const hasNext = computed(() => userStore.getUsers.hasNext)
@@ -24,8 +26,8 @@ const loadingEle = ref<HTMLDivElement>()
 
 const onCreateRoom = async (userId: string) => {
   try {
-    await apis.createChat(userId)
-    // TODO: router.push to /chat/{roomId}, currently can't get roomId of the created room
+    const { data } = await apis.createChat(userId)
+    router.push(`/chat/${data.roomId}`)
   } catch (e: any) {
     const err: AxiosError = e
     showErrorMessage(err)
