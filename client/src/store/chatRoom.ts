@@ -1,5 +1,6 @@
-import apis, { ChatList } from '@/lib/apis'
 import { defineStore } from 'pinia'
+import apis, { ChatList, Message } from '@/lib/apis'
+import { reorderArray } from '@/util/reorderArray'
 
 export const useChatRooms = defineStore('chatRooms', {
   state: (): { chatList: ChatList; loading: boolean } => ({
@@ -25,6 +26,28 @@ export const useChatRooms = defineStore('chatRooms', {
     },
     setLoading(loading: boolean) {
       this.loading = loading
+    },
+    /** websocket 以外からは呼ばない */
+    catchNewMessage(roomId: string, message: Message) {
+      const idx = this.chatList.chats.findIndex(c => c.roomId === roomId)
+      if (idx === -1) {
+        // room が見つからない場合
+        this.chatList.chats.unshift({
+          roomId,
+          name: message.userName,
+          latestMessage: message,
+          newMessageCount: 1
+        })
+        return
+      }
+
+      const prevData = this.chatList.chats[idx]
+      this.chatList.chats[idx] = {
+        ...prevData,
+        latestMessage: message,
+        newMessageCount: prevData.newMessageCount + 1
+      }
+      this.chatList.chats = reorderArray(this.chatList.chats, idx, 0)
     }
   }
 })
