@@ -74,7 +74,7 @@ func (ci *chatInfra) GetMessages(roomId string, limit int, offset int) (*model.M
 	}, nil
 }
 
-func (ci *chatInfra) CreateChat(destinationId string, post_user_id string) (*model.Message, error) {
+func (ci *chatInfra) CreateChat(destinationId string, post_user_id string) (*model.ChatData, error) {
 	post_user_name := ""
 	//create first message
 	err := ci.db.Get(
@@ -105,8 +105,29 @@ func (ci *chatInfra) CreateChat(destinationId string, post_user_id string) (*mod
 	if err != nil {
 		return nil, err
 	}
+
 	//post first message
-	return ci.PostChat(roomId, destinationId, &message, post_user_id)
+	m, err := ci.PostChat(roomId, destinationId, &message, post_user_id)
+	if err != nil {
+		return nil, err
+	}
+
+	var name string
+	err = ci.db.Get(
+		&name,
+		"SELECT `user_name` FROM `users` WHERE `user_id` = ?",
+		destinationId,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.ChatData{
+		RoomId:          roomId,
+		Name:            name,
+		LatestMessage:   *m,
+		NewMessageCount: 0,
+	}, nil
 }
 
 func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.ChatList, error) {
