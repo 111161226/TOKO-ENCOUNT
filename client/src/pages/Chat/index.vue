@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { AxiosError } from 'axios'
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, reactive, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useMe } from '@/store/me'
 import { useMessages } from '@/store/message'
@@ -16,7 +16,7 @@ const messageStore = useMessages()
 const route = useRoute()
 const roomId = route.params.id as string
 
-const otherUserName = ref('')
+const otherUser = reactive({ userId: '', userName: '' })
 const messages = computed(() => messageStore.getMessage(roomId).messages)
 const contentDivRef = ref<HTMLDivElement>()
 
@@ -24,7 +24,7 @@ const onSubmit = async () => {
   const message = draftMessageStore.getMessage(roomId)
   if (message) {
     try {
-      await messageStore.sendMessage(roomId, message)
+      await messageStore.sendMessage(roomId, otherUser.userId, message)
       draftMessageStore.setMessage(roomId, '')
     } catch (e: any) {
       const err: AxiosError = e
@@ -34,25 +34,30 @@ const onSubmit = async () => {
 }
 
 onMounted(async () => {
-  try {
-    messageStore.setLoading(true)
-    await messageStore.fetchData(roomId, 20)
+  if (messages.value.length === 0) {
+    // store に情報がない時だけ初回読み込みを実行
+    try {
+      messageStore.setLoading(true)
+      await messageStore.fetchData(roomId, 20)
+    } catch (e: any) {
+      const err: AxiosError = e
+      showErrorMessage(err)
+    } finally {
+      messageStore.setLoading(false)
+    }
+  }
 
-    if (roomId == '0') {
-      otherUserName.value = '全体チャット'
-    } else {
-      for (const message of messages.value) {
-        if (message.postUserId !== storeMe.getMe?.userId) {
-          otherUserName.value = message.userName
-          break
-        }
+  if (roomId == '0') {
+    otherUser.userName = '全体チャット'
+    otherUser.userId = '0'
+  } else {
+    for (const message of messages.value) {
+      if (message.postUserId !== storeMe.getMe?.userId) {
+        otherUser.userName = message.userName
+        otherUser.userId = message.postUserId
+        break
       }
     }
-  } catch (e: any) {
-    const err: AxiosError = e
-    showErrorMessage(err)
-  } finally {
-    messageStore.setLoading(false)
   }
 
   if (contentDivRef.value) {
@@ -65,7 +70,7 @@ onMounted(async () => {
 <template>
   <div class="chat-container">
     <div class="header">
-      {{ otherUserName }}
+      {{ otherUser.userName }}
     </div>
     <div class="content" ref="contentDivRef">
       <message-list

@@ -33,8 +33,10 @@ export const useMessages = defineStore('messages', {
         }
       }
     },
-    async sendMessage(roomId: string, message: string) {
-      const { data } = await api.postChat(roomId, { post: message })
+    async sendMessage(roomId: string, destinationId: string, message: string) {
+      const { data } = await api.postChat(roomId, destinationId, {
+        post: message
+      })
       this.messages[roomId].messages.unshift(data)
     },
     setLoading(value: boolean) {
