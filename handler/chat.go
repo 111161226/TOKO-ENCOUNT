@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"database/sql"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -50,7 +52,19 @@ func (h *Handler) CreateChat(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+
 	did := c.QueryParam("did")
+	if did == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "`did` is required")
+	}
+	_, err = h.ui.GetUser(did)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return echo.NewHTTPError(http.StatusBadRequest, "invalid `did`")
+		}
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
 	roomData, err := h.ci.CreateChat(did, sess.UserId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())

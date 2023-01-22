@@ -21,9 +21,16 @@ func EnsureExistChatAndHaveAccessRight(h *handler.Handler) echo.MiddlewareFunc {
 			}
 
 			correct := false
+			validDid := false
 			if rid == "0" {
 				correct = true
+				validDid = true
 			} else {
+				did := c.QueryParam("did")
+				if did == "" {
+					return echo.NewHTTPError(http.StatusBadRequest, "`did` is required")
+				}
+
 				users, err := h.PickChatByRoomId(rid)
 				if err != nil {
 					return err
@@ -31,13 +38,20 @@ func EnsureExistChatAndHaveAccessRight(h *handler.Handler) echo.MiddlewareFunc {
 				for _, user := range *(users.ChatUsers) {
 					if sess.UserId == user.UserId {
 						correct = true
-						break
+					}
+
+					if did == user.UserId {
+						validDid = true
 					}
 				}
 			}
 			if !correct {
 				return echo.NewHTTPError(http.StatusForbidden, "cannot access other's chat")
 			}
+			if !validDid {
+				return echo.NewHTTPError(http.StatusBadRequest, "invalid `did`")
+			}
+
 			return next(c)
 		}
 	}
