@@ -160,38 +160,26 @@ func (ui *userInfra) CheckUsedUserName(userName string) (*model.UserWithoutPass,
 	return &user, nil
 }
 
-func (ui *userInfra) GetUserList(limit int, offset int, name string, gender string, prefect string) (*model.UserList, error) {
+func (ui *userInfra) GetUserList(limit int, offset int, name string, gender string, prefect string, user_id string) (*model.UserList, error) {
 	//クエリ文作成
 	query := ""
-	query1 := "SELECT `user_id`, `user_name`, `prefect`, `gender` FROM `users` "
-	query2 := "SELECT COUNT(*) FROM `users` "
-	bind := []interface{}{}
-	first := 1
+	query1 := "SELECT `user_id`, `user_name`, `prefect`, `gender` FROM `users` WHERE `user_id` != ? "
+	query2 := "SELECT COUNT(*) FROM `users` WHERE `user_id` != ? "
+	bind := []interface{}{
+		user_id,
+	}
 	if name != "" {
-		query += "WHERE `user_name` LIKE ? "
-		first = 0
+		query += "AND `user_name` LIKE ? "
 		bind = append(bind, "%"+name+"%")
 	}
 
 	if gender != "" {
-		if first == 0 {
-			query += "AND "
-		} else {
-			query += "WHERE "
-			first = 0
-		}
-		query += "`gender` = ? "
+		query += "AND `gender` = ? "
 		bind = append(bind, gender)
 	}
 
 	if prefect != "" {
-		if first == 0 {
-			query += "AND "
-		} else {
-			query += "WHERE "
-			first = 0
-		}
-		query += "`prefect` = ? "
+		query += "AND `prefect` = ? "
 		bind = append(bind, prefect)
 	}
 
