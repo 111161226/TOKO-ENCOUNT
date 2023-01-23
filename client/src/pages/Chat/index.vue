@@ -34,7 +34,7 @@ const onSubmit = async () => {
 }
 
 onMounted(async () => {
-  if (messages.value.length < 20) {
+  if (messages.value.length < 20 && messageStore.getMessage(roomId).hasNext) {
     // store に情報がない時だけ初回読み込みを実行
     try {
       messageStore.setLoading(true)
