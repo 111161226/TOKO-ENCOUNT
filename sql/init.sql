@@ -47,3 +47,20 @@ CREATE TABLE `sessions` (
   `user_id` VARCHAR(37) NOT NULL,
   PRIMARY KEY (`session_id`)
 );
+
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` (`user_id`, `user_name`, `password`, `prefect`, `gender`)
+VALUES
+  ('system', 'system', 'system', 'system', 'system');
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+LOCK TABLES `chats` WRITE;
+/*!40000 ALTER TABLE `chats` DISABLE KEYS */;
+INSERT INTO `chats` (`chat_id`, `room_id`, `destination_user_id`, `post`, `post_user_id`)
+VALUES
+  ('0', '0', '0', 'This is general chat.', 'system');
+/*!40000 ALTER TABLE `chats` ENABLE KEYS */;
+UNLOCK TABLES;

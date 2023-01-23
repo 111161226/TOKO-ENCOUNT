@@ -32,12 +32,6 @@ export const sidebarRoutes: IRouteRecordRaw[] = [
     meta: { title: 'Home' }
   },
   {
-    path: '/timeline',
-    name: 'Timeline',
-    component: {}, // TODO
-    meta: { title: 'Timeline' }
-  },
-  {
     path: '/search',
     name: 'Search',
     component: () => import('@/pages/Search/index.vue'),

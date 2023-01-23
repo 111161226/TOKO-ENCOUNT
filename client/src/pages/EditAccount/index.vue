@@ -9,7 +9,9 @@ import { getRules } from '@/util/validate'
 import { prefectures } from '@/util/prefectures'
 const meStore = useMe()
 const formRef = ref<FormInstance>()
-const rules = reactive(getRules(['userName','newPassword', 'password', 'prefect', 'gender']))
+const rules = reactive(
+  getRules(['userName', 'newPassword', 'password', 'prefect', 'gender'])
+)
 const isFormValid = ref(false)
 watchEffect(() => {
   const { value } = formRef
@@ -71,18 +73,16 @@ const confirmUpdate = async () => {
       label-position="top"
     >
       <el-form-item prop="userName" label="ユーザー名">
-        <el-input v-model="inputData.userName" maxlength="30" show-word-limit/>
+        <el-input v-model="inputData.userName" maxlength="30" show-word-limit />
       </el-form-item>
       <el-form-item prop="gender" label="性別">
-        <el-select
-          v-model="inputData.gender"
-        >
+        <el-select v-model="inputData.gender">
           <el-option label="male" value="male" />
           <el-option label="female" value="female" />
         </el-select>
       </el-form-item>
       <el-form-item prop="prefect" label="都道府県">
-        <el-select v-model="inputData.prefect" > 
+        <el-select v-model="inputData.prefect">
           <el-option
             v-for="item in prefectures"
             :key="item.value"
@@ -93,11 +93,11 @@ const confirmUpdate = async () => {
       </el-form-item>
       <el-form-item prop="newPassword" label="新しいパスワード">
         <el-input
-            v-model="inputData.newPassword"
-            type="password"
-            show-password
-            placeholder="変更しない場合は現在のパスワード"
-            />
+          v-model="inputData.newPassword"
+          type="password"
+          show-password
+          placeholder="変更しない場合は現在のパスワード"
+        />
       </el-form-item>
       <el-form-item prop="password" label="現在のパスワードを入力して更新">
         <el-input
@@ -135,7 +135,6 @@ const confirmUpdate = async () => {
     text-align: center;
   }
 }
-
 
 .button {
   background-color: $color-primary;
