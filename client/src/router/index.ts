@@ -40,7 +40,7 @@ export const sidebarRoutes: IRouteRecordRaw[] = [
   {
     path: '/search',
     name: 'Search',
-    component: {}, // TODO
+    component: () => import('@/pages/Search/index.vue'),
     meta: { title: 'Search' }
   },
   {
