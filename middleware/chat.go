@@ -27,8 +27,13 @@ func EnsureExistChatAndHaveAccessRight(h *handler.Handler) echo.MiddlewareFunc {
 				validDid = true
 			} else {
 				did := c.QueryParam("did")
-				if did == "" {
+				method := c.Request().Method
+				if did == "" && method != "GET" {
 					return echo.NewHTTPError(http.StatusBadRequest, "`did` is required")
+				}
+
+				if method == "GET" {
+					validDid = true
 				}
 
 				users, err := h.PickChatByRoomId(rid)
