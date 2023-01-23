@@ -11,7 +11,7 @@ import { prefectures } from '@/util/prefectures'
 const meStore = useMe()
 
 const formRef = ref<FormInstance>()
-const rules = reactive(getRules(['userName', 'password','gender','prefect']))
+const rules = reactive(getRules(['userName', 'password', 'gender', 'prefect']))
 const isFormValid = ref(false)
 watchEffect(() => {
   const { value } = formRef
@@ -84,16 +84,14 @@ const confirmCreate = async () => {
         />
       </el-form-item>
       <el-form-item prop="gender" label="性別">
-        <el-select
-          v-model="inputData.gender"
-        >
+        <el-select v-model="inputData.gender">
           <el-option label="male" value="male" />
           <el-option label="female" value="female" />
         </el-select>
       </el-form-item>
 
       <el-form-item prop="prefect" label="都道府県">
-        <el-select v-model="inputData.prefect" > 
+        <el-select v-model="inputData.prefect">
           <el-option
             v-for="item in prefectures"
             :key="item.value"
@@ -104,15 +102,15 @@ const confirmCreate = async () => {
       </el-form-item>
     </el-form>
     <div>
-    <el-button
-      type="primary"
-      class="button"
-      :loading="loading"
-      :disabled="!isFormValid"
-      @click="confirmCreate"
-    >
-      アカウント作成
-    </el-button>
+      <el-button
+        type="primary"
+        class="button"
+        :loading="loading"
+        :disabled="!isFormValid"
+        @click="confirmCreate"
+      >
+        アカウント作成
+      </el-button>
     </div>
     <div class="bottom-nav">
       <router-link :to="{ name: 'Login' }" class="link">ログイン</router-link>
@@ -134,14 +132,13 @@ const confirmCreate = async () => {
     text-align: center;
   }
 
-
   .bottom-nav {
     display: flex;
     justify-content: flex-end;
     margin-top: 30px;
   }
 
-  .link{
+  .link {
     color: $color-primary;
     transition: color 0.2s;
     text-decoration: none;
@@ -150,7 +147,6 @@ const confirmCreate = async () => {
       text-decoration: underline;
     }
   }
-  
 }
 .button {
   background-color: $color-primary;

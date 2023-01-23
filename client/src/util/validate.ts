@@ -2,7 +2,12 @@ import validator from 'validator'
 import { RuleItem } from 'async-validator'
 import { FormRules } from 'element-plus'
 
-export type InputField = 'password' | 'newPassword'| 'userName' | 'prefect' | 'gender'
+export type InputField =
+  | 'password'
+  | 'newPassword'
+  | 'userName'
+  | 'prefect'
+  | 'gender'
 
 const isValidInput = (item: InputField, str: string) => {
   const validators: Record<InputField, (str: string) => boolean> = {

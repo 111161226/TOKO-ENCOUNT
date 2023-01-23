@@ -68,7 +68,7 @@ const login = async () => {
       label-position="top"
     >
       <el-form-item prop="userName" label="ユーザー名">
-        <el-input v-model="inputData.userName" maxlength="30" show-word-limit/>
+        <el-input v-model="inputData.userName" maxlength="30" show-word-limit />
       </el-form-item>
       <el-form-item prop="password" label="パスワード">
         <el-input
@@ -80,18 +80,20 @@ const login = async () => {
       </el-form-item>
     </el-form>
     <div class="button-position">
-    <el-button
-      class="button"
-      type="primary"
-      :loading="loading"
-      :disabled="!isFormValid"
-      @click="login"
-    >
-      ログイン
-    </el-button>
-  </div>
+      <el-button
+        class="button"
+        type="primary"
+        :loading="loading"
+        :disabled="!isFormValid"
+        @click="login"
+      >
+        ログイン
+      </el-button>
+    </div>
     <div class="bottom-nav">
-      <router-link :to="{ name: 'CreateAccount' }" class="link">アカウント作成</router-link>
+      <router-link :to="{ name: 'CreateAccount' }" class="link"
+        >アカウント作成</router-link
+      >
     </div>
   </div>
 </template>
@@ -102,7 +104,6 @@ const login = async () => {
   width: 80%;
   margin: 0 auto;
   padding-top: 20vh;
-  
 
   .title {
     font-size: 30px;
@@ -117,7 +118,7 @@ const login = async () => {
     margin-top: 30px;
   }
 
-  .link{
+  .link {
     color: $color-primary;
     transition: color 0.2s;
     text-decoration: none;
@@ -127,7 +128,7 @@ const login = async () => {
     }
   }
 
-  .button-position{
+  .button-position {
     display: flex;
     justify-content: center;
   }
@@ -143,6 +144,4 @@ const login = async () => {
     }
   }
 }
-
-
 </style>
