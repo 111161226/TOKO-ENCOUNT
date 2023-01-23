@@ -36,7 +36,12 @@ func (ws *webSocketPublisher) NotifyNewMessage(userIds []string, roomId string, 
 	}
 
 	if roomId == "0" { // 全体チャットの場合
-		for _, connections := range ws.userIdConnectionPool { // 全員に通知
+		for id, connections := range ws.userIdConnectionPool { // 全員に通知
+			if id == message.UserId {
+				// 送信者には通知しない
+				continue
+			}
+
 			for connection := range connections {
 				err := websocket.JSON.Send(connection, n)
 				if err != nil {
