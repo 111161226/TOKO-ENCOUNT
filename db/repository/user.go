@@ -13,5 +13,5 @@ type UserRepository interface {
 	//check username is duplicated
 	CheckUsedUserName(userName string) (*model.UserWithoutPass, error)
 	//search users
-	GetUserList(limit int, offset int, name string, gender string, prefect string) (*model.UserList, error)
+	GetUserList(limit int, offset int, name string, gender string, prefect string, user_id string) (*model.UserList, error)
 }

@@ -127,6 +127,10 @@ func (h *Handler) GetMyUser(c echo.Context) error {
 }
 
 func (h *Handler) SearchUser(c echo.Context) error {
+	sess, err := h.PickSession(c)
+	if err != nil {
+		return err
+	}
 	//入力取得
 	l := c.QueryParam("limit")
 	if l == "" {
@@ -151,7 +155,7 @@ func (h *Handler) SearchUser(c echo.Context) error {
 	prefect := c.QueryParam("prefect")
 
 	//対象となるユーザ取得
-	userlist, err := h.ui.GetUserList(limit, offset, name, gender, prefect)
+	userlist, err := h.ui.GetUserList(limit, offset, name, gender, prefect, sess.UserId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
