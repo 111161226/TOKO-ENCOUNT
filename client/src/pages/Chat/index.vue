@@ -5,6 +5,7 @@ import { useRoute } from 'vue-router'
 import { useMe } from '@/store/me'
 import { useMessages } from '@/store/message'
 import { useDraftMessages } from '@/store/draftMessage'
+import { useroomUsers } from '@/store/roomUser'
 import { showErrorMessage } from '@/util/showErrorMessage'
 import ChatInput from './components/ChatInput.vue'
 import MessageList from './components/MessageList.vue'
@@ -12,6 +13,7 @@ import MessageList from './components/MessageList.vue'
 const storeMe = useMe()
 const draftMessageStore = useDraftMessages()
 const messageStore = useMessages()
+const storeRoomUser = useroomUsers()
 
 const route = useRoute()
 const roomId = route.params.id as string
@@ -51,12 +53,18 @@ onMounted(async () => {
     otherUser.userName = '全体チャット'
     otherUser.userId = '0'
   } else {
-    for (const message of messages.value) {
-      if (message.postUserId !== storeMe.getMe?.userId) {
-        otherUser.userName = message.userName
-        otherUser.userId = message.postUserId
-        break
+    if (!storeRoomUser.getUser(roomId)?.userId) {
+      for (const message of messages.value) {
+        if (message.postUserId !== storeMe.getMe?.userId) {
+          otherUser.userName = message.userName
+          otherUser.userId = message.postUserId
+          storeRoomUser.setUser(roomId, message.userName, message.postUserId)
+          break
+        }
       }
+    } else {
+      otherUser.userName = storeRoomUser.getUser(roomId)?.userName
+      otherUser.userId = storeRoomUser.getUser(roomId)?.userId
     }
   }
 
