@@ -1,6 +1,6 @@
 FROM node:16-alpine AS client-build
 RUN apk add --update --no-cache openjdk8-jre-base
-WORKDIR /github.com/cs-sysimpl/SakataKintoki/client
+WORKDIR /github.com/111161226/TOKO-ENCOUNT/client
 COPY ./client/package*.json ./
 COPY ./client/scripts ./scripts
 COPY ./docs ../docs
@@ -11,7 +11,7 @@ RUN npm run build
 
 FROM golang:1.17-alpine AS server-build
 RUN apk add --update --no-cache git
-WORKDIR /go/src/github.com/cs-sysimpl/SakataKintoki
+WORKDIR /go/src/github.com/111161226/TOKO-ENCOUNT
 COPY ./go.* ./
 COPY docs/swagger.yaml /docs/swagger.yaml
 COPY docs/swagger-ui-diff.patch /docs/swagger-ui-diff.patch
@@ -31,7 +31,7 @@ ENV DOCKERIZE_VERSION v0.6.1
 RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
  && tar -C /usr/local/bin -xzvf dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
  && rm dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz
-COPY --from=client-build /github.com/cs-sysimpl/SakataKintoki/client/dist ./web/dist
-COPY --from=server-build /go/src/github.com/cs-sysimpl/SakataKintoki ./
+COPY --from=client-build /github.com/111161226/TOKO-ENCOUNT/client/dist ./web/dist
+COPY --from=server-build /go/src/github.com/111161226/TOKO-ENCOUNT ./
 COPY --from=server-build /docs/swagger-ui/dist ./docs/swagger-ui/dist
 ENTRYPOINT ./SakataKintoki

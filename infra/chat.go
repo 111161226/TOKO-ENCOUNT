@@ -3,8 +3,8 @@ package infra
 import (
 	"fmt"
 
-	"github.com/cs-sysimpl/SakataKintoki/db/model"
-	"github.com/cs-sysimpl/SakataKintoki/db/repository"
+	"github.com/111161226/TOKO-ENCOUNT/db/model"
+	"github.com/111161226/TOKO-ENCOUNT/db/repository"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )

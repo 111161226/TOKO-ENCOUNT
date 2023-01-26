@@ -3,8 +3,8 @@ package main
 import (
 	"strings"
 
-	"github.com/cs-sysimpl/SakataKintoki/handler"
-	mid "github.com/cs-sysimpl/SakataKintoki/middleware"
+	"github.com/111161226/TOKO-ENCOUNT/handler"
+	mid "github.com/111161226/TOKO-ENCOUNT/middleware"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"

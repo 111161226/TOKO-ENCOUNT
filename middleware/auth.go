@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/cs-sysimpl/SakataKintoki/handler"
+	"github.com/111161226/TOKO-ENCOUNT/handler"
 	"github.com/labstack/echo/v4"
 )
 

@@ -8,7 +8,7 @@ import (
 
 	"fmt"
 
-	"github.com/cs-sysimpl/SakataKintoki/db/model"
+	"github.com/111161226/TOKO-ENCOUNT/db/model"
 	"github.com/labstack/echo/v4"
 )
 

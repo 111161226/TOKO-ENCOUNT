@@ -1,4 +1,4 @@
-module github.com/cs-sysimpl/SakataKintoki
+module github.com/111161226/TOKO-ENCOUNT
 
 go 1.17
 

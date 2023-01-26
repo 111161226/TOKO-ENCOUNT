@@ -3,8 +3,8 @@ package handler
 import (
 	"net/http"
 
-	"github.com/cs-sysimpl/SakataKintoki/db/repository"
-	"github.com/cs-sysimpl/SakataKintoki/infra"
+	"github.com/111161226/TOKO-ENCOUNT/db/repository"
+	"github.com/111161226/TOKO-ENCOUNT/infra"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"

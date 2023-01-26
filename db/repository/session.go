@@ -1,6 +1,6 @@
 package repository
 
-import "github.com/cs-sysimpl/SakataKintoki/db/model"
+import "github.com/111161226/TOKO-ENCOUNT/db/model"
 
 type SessionRepository interface {
 	CreateSession(userId string) (*model.Session, error)

@@ -1,6 +1,6 @@
 package repository
 
-import "github.com/cs-sysimpl/SakataKintoki/db/model"
+import "github.com/111161226/TOKO-ENCOUNT/db/model"
 
 type ChatRepository interface {
 	PostChat(roomId string, destinationId string, message *model.MessageSimple, post_user_id string) (*model.Message, error)
