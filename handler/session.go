@@ -9,6 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+//get session by session id
 func (h *Handler) PickSession(c echo.Context) (*model.Session, error) {
 	cookie, err := c.Cookie("session_id")
 	if err != nil {
@@ -30,6 +31,7 @@ func (h *Handler) PickSession(c echo.Context) (*model.Session, error) {
 	return sess, nil
 }
 
+//create and set Cookie
 func createSessionAndSetCookie(c echo.Context, h *Handler, userId string) error {
 	sess, err := h.si.CreateSession(userId)
 	if err != nil {

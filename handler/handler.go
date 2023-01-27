@@ -17,6 +17,7 @@ type Handler struct {
 	ws *webSocketPublisher
 }
 
+//define hundler
 func NewHandler(db *sqlx.DB) *Handler {
 	ui := infra.NewUserInfra(db)
 	ci := infra.NewChatInfra(db)

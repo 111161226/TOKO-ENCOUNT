@@ -136,7 +136,7 @@ func (h *Handler) GetMyUser(c echo.Context) error {
 		return err
 	}
 
-	//自身のユーザー情報取得
+	//get my user info
 	user, err := h.ui.GetUser(sess.UserId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -150,7 +150,7 @@ func (h *Handler) SearchUser(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	//入力取得
+	//get input
 	l := c.QueryParam("limit")
 	if l == "" {
 		l = "20"
@@ -173,7 +173,7 @@ func (h *Handler) SearchUser(c echo.Context) error {
 	gender := c.QueryParam("gender")
 	prefect := c.QueryParam("prefect")
 
-	//対象となるユーザ取得
+	//get users who match conditions
 	userlist, err := h.ui.GetUserList(limit, offset, name, gender, prefect, sess.UserId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())

@@ -36,7 +36,7 @@ paths:
           description: ログアウトに成功しました
   
   '/api/delete':
-    post:
+    delete:
       summary: ログアウト
       operationId: deleteMe
       responses:

@@ -29,16 +29,19 @@ func (h *Handler) ChatPost(c echo.Context) error {
 		return err
 	}
 
+	//send message
 	postedMessage, err := h.ci.PostChat(rid, did, post, sess.UserId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
+	//notify new message to talk opponent
 	err = h.ws.NotifyNewMessage([]string{did}, rid, postedMessage)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-
+	
+	//increment talk opponent not read number
 	err = h.ci.IncrementNotRead(rid, sess.UserId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -47,6 +50,7 @@ func (h *Handler) ChatPost(c echo.Context) error {
 	return c.JSON(http.StatusOK, postedMessage)
 }
 
+//add new chat
 func (h *Handler) CreateChat(c echo.Context) error {
 	sess, err := h.PickSession(c)
 	if err != nil {
@@ -57,6 +61,7 @@ func (h *Handler) CreateChat(c echo.Context) error {
 	if did == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, "`did` is required")
 	}
+	//chaeck did user is valid in creating chat
 	u, err := h.ui.GetUser(did)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -73,6 +78,7 @@ func (h *Handler) CreateChat(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
+	//notify new message to talk opponent
 	err = h.ws.NotifyNewMessage([]string{did}, roomData.RoomId, &roomData.LatestMessage)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -81,6 +87,7 @@ func (h *Handler) CreateChat(c echo.Context) error {
 	return c.JSON(http.StatusOK, roomData)
 }
 
+//get current chat message
 func (h *Handler) GetMessages(c echo.Context) error {
 	rid := c.Param("rid")
 	l := c.QueryParam("limit")
@@ -109,6 +116,7 @@ func (h *Handler) GetMessages(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	//reset not read message
 	err = h.ci.ResetNotRead(rid, sess.UserId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -117,6 +125,7 @@ func (h *Handler) GetMessages(c echo.Context) error {
 	return c.JSON(http.StatusOK, message)
 }
 
+//get users who join the designated room
 func (h *Handler) PickChatByRoomId(roomId string) (*model.ChatUserList, error) {
 	users, err := h.ci.GetChatByRoomId(roomId)
 	if err != nil {
@@ -128,6 +137,7 @@ func (h *Handler) PickChatByRoomId(roomId string) (*model.ChatUserList, error) {
 	return users, nil
 }
 
+//get chat list
 func (h *Handler) GetChatList(c echo.Context) error {
 	sess, err := h.PickSession(c)
 	if err != nil {

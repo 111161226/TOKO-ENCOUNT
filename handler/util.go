@@ -7,7 +7,7 @@ import (
 )
 
 func validatedBind(c echo.Context, i interface{}) error {
-	err := c.Bind(i) // リクエストボディの取り出し
+	err := c.Bind(i) //get request body
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

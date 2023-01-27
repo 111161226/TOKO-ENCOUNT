@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+//check the user have the chat being entered 
 func EnsureExistChatAndHaveAccessRight(h *handler.Handler) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
@@ -22,12 +23,14 @@ func EnsureExistChatAndHaveAccessRight(h *handler.Handler) echo.MiddlewareFunc {
 
 			correct := false
 			validDid := false
+			//open chat is gone through whoever is loginned
 			if rid == "0" {
 				correct = true
 				validDid = true
-			} else {
+			} else { //private chat 
 				did := c.QueryParam("did")
 				method := c.Request().Method
+				//did is needed when method is POST
 				if did == "" && method != "GET" {
 					return echo.NewHTTPError(http.StatusBadRequest, "`did` is required")
 				}
@@ -36,6 +39,7 @@ func EnsureExistChatAndHaveAccessRight(h *handler.Handler) echo.MiddlewareFunc {
 					validDid = true
 				}
 
+				//check did and userid is invalid in that chat room
 				users, err := h.PickChatByRoomId(rid)
 				if err != nil {
 					return err

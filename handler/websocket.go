@@ -26,6 +26,7 @@ func newWebSocketPublisher() *webSocketPublisher {
 	}
 }
 
+//notify new received message
 func (ws *webSocketPublisher) NotifyNewMessage(userIds []string, roomId string, message *model.Message) error {
 	n := newMessageNotification{
 		Type: "NEW_MESSAGE",
@@ -35,10 +36,10 @@ func (ws *webSocketPublisher) NotifyNewMessage(userIds []string, roomId string, 
 		},
 	}
 
-	if roomId == "0" { // 全体チャットの場合
-		for id, connections := range ws.userIdConnectionPool { // 全員に通知
+	if roomId == "0" { //case : open chat
+		for id, connections := range ws.userIdConnectionPool { // notify all loginned
 			if id == message.UserId {
-				// 送信者には通知しない
+				//don't notify to posted user
 				continue
 			}
 
@@ -50,7 +51,7 @@ func (ws *webSocketPublisher) NotifyNewMessage(userIds []string, roomId string, 
 			}
 		}
 	} else {
-		for _, userId := range userIds { // 指定ユーザーにのみ通知
+		for _, userId := range userIds { //notify designated user
 			connections, ok := ws.userIdConnectionPool[userId]
 			if !ok {
 				continue
@@ -75,6 +76,7 @@ func (h *Handler) GetWebSocket(c echo.Context) error {
 
 	userId := sess.UserId
 
+	//websocket setting
 	server := websocket.Server{Handler: func(connection *websocket.Conn) {
 		defer connection.Close()
 

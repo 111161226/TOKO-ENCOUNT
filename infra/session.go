@@ -18,6 +18,7 @@ func NewSessionInfra(db *sqlx.DB) repository.SessionRepository {
 	return &sessionInfra{db: db}
 }
 
+//create session
 func (si *sessionInfra) CreateSession(userId string) (*model.Session, error) {
 	uu, err := uuid.NewRandom()
 	if err != nil {
@@ -41,6 +42,7 @@ func (si *sessionInfra) CreateSession(userId string) (*model.Session, error) {
 	}, nil
 }
 
+//get seesion by session id
 func (si *sessionInfra) GetSession(sessionId string) (*model.Session, error) {
 	sess := model.Session{}
 	err := si.db.Get(
@@ -55,6 +57,7 @@ func (si *sessionInfra) GetSession(sessionId string) (*model.Session, error) {
 	return &sess, nil
 }
 
+//delete session by session id
 func (si *sessionInfra) DeleteSessionBySessionId(sessionId string) error {
 	_, err := si.db.Exec(
 		"DELETE FROM `sessions` WHERE `session_id` = ?",
@@ -63,6 +66,7 @@ func (si *sessionInfra) DeleteSessionBySessionId(sessionId string) error {
 	return err
 }
 
+//delete session by user id
 func (si *sessionInfra) DeleteSessionsByUserId(userId string) error {
 	_, err := si.db.Exec(
 		"DELETE FROM `sessions` WHERE `user_id` = ?",
@@ -71,6 +75,7 @@ func (si *sessionInfra) DeleteSessionsByUserId(userId string) error {
 	return err
 }
 
+//check session is present
 func (si *sessionInfra) CheckSession(sessionId string) (*model.Session, error) {
 	sess := model.Session{}
 	err := si.db.Get(

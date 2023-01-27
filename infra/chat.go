@@ -17,6 +17,7 @@ func NewChatInfra(db *sqlx.DB) repository.ChatRepository {
 	return &chatInfra{db: db}
 }
 
+//post message to chat
 func (ci *chatInfra) PostChat(roomId string, destinationId string, message *model.MessageSimple, post_user_id string) (*model.Message, error) {
 	ch, err := uuid.NewRandom()
 	if err != nil {
@@ -47,7 +48,9 @@ func (ci *chatInfra) PostChat(roomId string, destinationId string, message *mode
 	return &mess, nil
 }
 
+//get chat message by chat id
 func (ci *chatInfra) GetMessages(roomId string, limit int, offset int) (*model.MessageList, error) {
+	//get message info
 	mess := []*model.Message{}
 	err := ci.db.Select(
 		&mess,
@@ -59,6 +62,7 @@ func (ci *chatInfra) GetMessages(roomId string, limit int, offset int) (*model.M
 	if err != nil {
 		return nil, err
 	}
+	//get total of message 
 	count := 0
 	err = ci.db.Get(
 		&count,
@@ -112,6 +116,7 @@ func (ci *chatInfra) CreateChat(destinationId string, post_user_id string) (*mod
 		return nil, err
 	}
 
+	//return room info
 	var name string
 	err = ci.db.Get(
 		&name,
@@ -138,7 +143,7 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 		NotRead           int    `db:"not_read"`
 	}
 	messages := []MessageDetail{}
-	// 自分が参加しているルームとその最新メッセージを取得
+	//get my joined rooms and those latest message
 	err := ci.db.Select(
 		&messages,
 		"SELECT `chat`.`post`, `chat`.`chat_id`, `chat`.`post_user_id`, `chat`.`created_at`, `chat`.`destination_user_id`, `room`.`room_id`, `room`.`not_read` FROM (SELECT * FROM (SELECT `chat_id`, `room_id`, `destination_user_id`, `post`, `post_user_id`, `created_at`, ROW_NUMBER() OVER(PARTITION BY `room_id` ORDER BY `created_at` DESC) AS `row_num` FROM `chats`) AS `c` WHERE `row_num` = 1) AS `chat` INNER JOIN (SELECT * FROM `room_datas` WHERE `user_id` = ?) AS `room` ON `room`.`room_id` = `chat`.`room_id` ORDER BY `chat`.`created_at` DESC LIMIT ? OFFSET ?",
@@ -158,25 +163,25 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 		return res, nil
 	}
 
-	// ユーザー名情報が必要なユーザーIDを列挙
+	//select userId user name is needed
 	ids := []string{}
 	for _, m := range messages {
-		if m.RoomId == "0" { // 全体チャットの場合
-			if m.UserId != userId { // 自分が送っていないメッセージの場合、送信者の名前が必要
+		if m.RoomId == "0" { // case open chat
+			if m.UserId != userId { //posting user is needed when the latest message is not sent by me
 				ids = append(ids, m.UserId)
 			}
 			continue
 		}
 
 		if m.UserId == userId {
-			// 最新メッセージが自分が送ったものの場合
+			//when the latest message is not sent by me
 			ids = append(ids, m.DestinationUserId)
 		} else {
-			// 最新メッセージが相手が送ったものの場合
+			//when the latest message is sent by me
 			ids = append(ids, m.UserId)
 		}
 	}
-	ids = append(ids, userId) // 自分のユーザー名も欲しい
+	ids = append(ids, userId) //want my username
 	query, args, err := sqlx.In("SELECT `user_id`, `user_name`, `prefect`, `gender` FROM `users` WHERE `user_id` IN (?)", ids)
 	if err != nil {
 		return nil, err
@@ -187,7 +192,7 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 		return nil, err
 	}
 
-	// ユーザーIDをキー、ユーザー名を値に持つ
+	//this dic has key in userId and value of username
 	idNameMap := map[string]string{}
 	for _, u := range users {
 		idNameMap[u.UserId] = u.UserName
@@ -200,7 +205,7 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 		if m.RoomId == "0" {
 			name = "全体チャット"
 		} else if m.UserId == userId {
-			// 最新メッセージが自分が送ったものの場合
+			//when the latest message is sent by me
 			name = idNameMap[m.DestinationUserId]
 		}
 		c := &model.ChatData{
@@ -212,7 +217,7 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 		chatLst = append(chatLst, c)
 	}
 
-	// 自分が参加しているルームの全数を取得
+	//get total of joined room number
 	count := 0
 	err = ci.db.Get(
 		&count,
@@ -228,6 +233,7 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 	return res, nil
 }
 
+//get users who join the designated chat ny roomId
 func (ci *chatInfra) GetChatByRoomId(roomId string) (*model.ChatUserList, error) {
 	users := []*model.ChatUser{}
 	err := ci.db.Select(
@@ -243,6 +249,7 @@ func (ci *chatInfra) GetChatByRoomId(roomId string) (*model.ChatUserList, error)
 	}, nil
 }
 
+//add new user to open chat 
 func (ci *chatInfra) AddOpenChat(userId string) error {
 	_, err := ci.db.Exec(
 		"INSERT INTO `room_datas` (`room_id`, `user_id`) VALUES (0, ?)",
@@ -251,6 +258,7 @@ func (ci *chatInfra) AddOpenChat(userId string) error {
 	return err
 }
 
+//not read message reset
 func (ci *chatInfra) ResetNotRead(roomId string, userId string) error {
 	_, err := ci.db.Exec(
 		"UPDATE `room_datas` SET `not_read` = 0, `latest_access` = CURRENT_TIMESTAMP WHERE `room_id` = ? AND `user_id` = ?",
@@ -260,6 +268,7 @@ func (ci *chatInfra) ResetNotRead(roomId string, userId string) error {
 	return err
 }
 
+//not read message increment
 func (ci *chatInfra) IncrementNotRead(roomId string, userId string) error {
 	_, err := ci.db.Exec(
 		"UPDATE `room_datas` SET `not_read` = `not_read` + 1 WHERE `room_id` = ? AND `user_id` != ?",

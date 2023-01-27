@@ -5,16 +5,17 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+//check user is loginned
 func EnsureAuthorized(h *handler.Handler) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			path := c.Path()
 			method := c.Request().Method
 			if path == "/api/user" && method == "POST" {
-				// アカウント作成は未ログイン状態で行われるので通す
+				//go through when creating account because it is done with noy loggined
 				return next(c)
 			}
-
+			//get session info
 			_, err := h.PickSession(c)
 			if err != nil {
 				return err
