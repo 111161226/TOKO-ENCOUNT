@@ -21,7 +21,7 @@ func NewUserInfra(db *sqlx.DB) repository.UserRepository {
 	return &userInfra{db: db}
 }
 
-//ハッシュ化関数
+//func for hashing password
 func hash(pw string) string {
 	const salt = "SakataKintoki#"
 	h := sha256.New()
@@ -30,8 +30,32 @@ func hash(pw string) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
+//delete user by logic
+func (ui *userInfra) DeleteUser(userId string) error {
+	//get username by userId
+	var username string
+	err := ui.db.Get(
+		&username, "SELECT `user_name` FROM `users` WHERE `user_id` = ?",
+		userId,
+	)
+	if err != nil {
+		return err
+	}
+	//delete user by username
+	_, err = ui.db.Exec(
+		"UPDATE `user_deletes` SET `flag` = ? WHERE `user_name` = ?",
+		1,
+		username,
+	)
+	if err != nil {
+		return err
+	} 
+	return err
+}
+
+//create user
 func (ui *userInfra) CreateUser(user *model.User) (*model.UserWithoutPass, error) {
-	//UUID設定
+	//set uuid
 	uu, err := uuid.NewRandom()
 	if err != nil {
 		return nil, err
@@ -39,7 +63,7 @@ func (ui *userInfra) CreateUser(user *model.User) (*model.UserWithoutPass, error
 
 	userId := uu.String()
 
-	//DB挿入
+	//insert data into DB
 	_, err = ui.db.Exec(
 		"INSERT INTO `users`(`user_id`, `user_name`, `password`, `prefect`, `gender`) VALUES (?, ?, ?, ? ,?)",
 		userId,
@@ -47,6 +71,13 @@ func (ui *userInfra) CreateUser(user *model.User) (*model.UserWithoutPass, error
 		hash(user.Password),
 		user.Prefect,
 		user.Gender,
+	)
+	if err != nil {
+		return nil, err
+	}
+	_, err = ui.db.Exec(
+		"INSERT INTO `user_deletes` (`user_name`) VALUES (?)",
+		user.UserName,
 	)
 	if err != nil {
 		return nil, err
@@ -61,7 +92,7 @@ func (ui *userInfra) CreateUser(user *model.User) (*model.UserWithoutPass, error
 }
 
 func (ui *userInfra) GetUser(userId string) (*model.UserWithoutPass, error) {
-	//ユーザ取得
+	//get user data
 	var user model.UserWithoutPass
 	err := ui.db.Get(
 		&user, "SELECT `user_id`, `user_name`, `prefect`, `gender` FROM `users` WHERE `user_id` = ?",
@@ -75,7 +106,7 @@ func (ui *userInfra) GetUser(userId string) (*model.UserWithoutPass, error) {
 }
 
 func (ui *userInfra) EditUser(userId string, user *model.UserUpdate) (*model.UserWithoutPass, error) {
-	//古いパスワード取得
+	//get old password
 	var oldpassword string
 	err := ui.db.Get(
 		&oldpassword, "SELECT `password` FROM `users` WHERE `user_id` = ?",
@@ -85,12 +116,12 @@ func (ui *userInfra) EditUser(userId string, user *model.UserUpdate) (*model.Use
 		return nil, err
 	}
 
-	//パスワード照合
+	//check password is right
 	if oldpassword != hash(user.Password) {
-		return nil, nil //間違っている場合は返り値nil
+		return nil, nil //in case password is incorrect , return nil
 	}
 
-	//DB更新
+	//update DB
 	_, err = ui.db.Exec(
 		"UPDATE `users` SET `user_name` = ?, `password` = ?, `prefect` = ?, `gender` = ? WHERE `user_id` = ?",
 		user.UserName,
@@ -112,7 +143,7 @@ func (ui *userInfra) EditUser(userId string, user *model.UserUpdate) (*model.Use
 }
 
 func (ui *userInfra) CheckRightUser(user *model.UserSimple) (*model.UserWithoutPass, error) {
-	//パスワード取得
+	//get password
 	var password string
 	err := ui.db.Get(
 		&password, "SELECT `password` FROM `users` WHERE `user_name` = ?",
@@ -122,12 +153,12 @@ func (ui *userInfra) CheckRightUser(user *model.UserSimple) (*model.UserWithoutP
 		return nil, err
 	}
 
-	//パスワード照合
+	//check password is right
 	if password != hash(user.Password) {
 		return nil, fmt.Errorf("err : %s", "Incorrect password")
 	}
 
-	//User取得
+	//get user data
 	var userwithoutpass model.UserWithoutPass
 	err = ui.db.Get(
 		&userwithoutpass, "SELECT `user_id`, `user_name`, `prefect`, `gender` FROM `users` WHERE `user_name` = ?",
@@ -141,7 +172,7 @@ func (ui *userInfra) CheckRightUser(user *model.UserSimple) (*model.UserWithoutP
 }
 
 func (ui *userInfra) CheckUsedUserName(userName string) (*model.UserWithoutPass, error) {
-	// userName取得
+	//get userName
 	var user model.UserWithoutPass
 	err := ui.db.Get(
 		&user, "SELECT `user_id`, `user_name`, `prefect`, `gender` FROM `users` WHERE `user_name` = ?",
@@ -149,25 +180,26 @@ func (ui *userInfra) CheckUsedUserName(userName string) (*model.UserWithoutPass,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			// 名前の重複したユーザーが存在しないならエラーではない
+			//in case no one uses the username, that is not error 
 			return nil, nil
 		}
 
 		return nil, err
 	}
 
-	// 重複している場合はuser!=nil
+	//in case the username is duplicated, user is not nil
 	return &user, nil
 }
 
 func (ui *userInfra) GetUserList(limit int, offset int, name string, gender string, prefect string, user_id string) (*model.UserList, error) {
-	//クエリ文作成
+	//create query
 	query := ""
 	query1 := "SELECT `user_id`, `user_name`, `prefect`, `gender` FROM `users` WHERE `user_id` != ? "
 	query2 := "SELECT COUNT(*) FROM `users` WHERE `user_id` != ? "
 	bind := []interface{}{
 		user_id,
 	}
+	//check condition is added 
 	if name != "" {
 		query += "AND `user_name` LIKE ? "
 		bind = append(bind, "%"+name+"%")
@@ -183,7 +215,7 @@ func (ui *userInfra) GetUserList(limit int, offset int, name string, gender stri
 		bind = append(bind, prefect)
 	}
 
-	//対象となるユーザを取得
+	//get designated user 
 	query1 = query1 + query + "LIMIT ? OFFSET ? "
 	bind1 := append(bind, limit, offset)
 	users := []*model.UserWithoutPass{}
@@ -196,7 +228,7 @@ func (ui *userInfra) GetUserList(limit int, offset int, name string, gender stri
 		return nil, err
 	}
 
-	//対象となるユーザの全数を取得
+	//get the number of the designated user
 	query2 = query2 + query
 	var count int
 	err = ui.db.Get(

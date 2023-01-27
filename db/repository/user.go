@@ -7,7 +7,7 @@ type UserRepository interface {
 	GetUser(userId string) (*model.UserWithoutPass, error)
 	EditUser(userId string, user *model.UserUpdate) (*model.UserWithoutPass, error)
 	//withdraw user by logic delete
-	//DeleteUser(userId string, pass string) error
+	DeleteUser(userId string) error
 	//check whether user can login
 	CheckRightUser(user *model.UserSimple) (*model.UserWithoutPass, error)
 	//check username is duplicated

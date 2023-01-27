@@ -14,8 +14,8 @@ CREATE TABLE `users` (
 DROP TABLE IF EXISTS `user_deletes`;
 CREATE TABLE `user_deletes` (
   `flag` SMALLINT DEFAULT 0,
-  `user_id` VARCHAR(37) NOT NULL,
-  PRIMARY KEY (`user_id`)
+  `user_name` VARCHAR(37) NOT NULL,
+  PRIMARY KEY (`user_name`)
 );
 
 -- db for private and open chat content

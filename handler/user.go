@@ -8,12 +8,30 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (h *Handler) Logout(c echo.Context) error {
+//withdraw user by logic
+func (h *Handler) DeleteUser(c echo.Context) error {
+	//get userid by session
 	sess, err := h.PickSession(c)
 	if err != nil {
 		return err
 	}
+	//delete user
+	err = h.ui.DeleteUser(sess.SessionId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
 
+	return c.NoContent(http.StatusOK)
+}
+
+//func for logout
+func (h *Handler) Logout(c echo.Context) error {
+	//get userid by session
+	sess, err := h.PickSession(c)
+	if err != nil {
+		return err
+	}
+	//delete session
 	err = h.si.DeleteSessionBySessionId(sess.SessionId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -22,21 +40,22 @@ func (h *Handler) Logout(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
+//func for login
 func (h *Handler) Login(c echo.Context) error {
-	//入力取得
+	//get user input
 	u := new(model.UserSimple)
 	err := validatedBind(c, u)
 	if err != nil {
 		return err
 	}
 
-	//ログインチェック
+	//check if user can login
 	user, err := h.ui.CheckRightUser(u)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid name or password")
 	}
 
-	//セッション作成
+	//create session
 	err = createSessionAndSetCookie(c, h, user.UserId)
 	if err != nil {
 		return err
@@ -46,37 +65,37 @@ func (h *Handler) Login(c echo.Context) error {
 }
 
 func (h *Handler) SignUp(c echo.Context) error {
-	//入力取得
+	//get new user input
 	u := new(model.User)
 	err := validatedBind(c, u)
 	if err != nil {
 		return err
 	}
 
-	//ユーザ名、パスワード確認
+	//check username and password
 	if u.UserName == "" || u.Password == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid name or password")
 	}
 
-	//重複チェック
+	//check if username is duplicated
 	userdup, err := h.ui.CheckUsedUserName(u.UserName)
-	if err != nil { // DBエラーの場合
+	if err != nil { // error for db
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-	} else if userdup != nil { // 重複している場合
+	} else if userdup != nil { // case in duplicated
 		return echo.NewHTTPError(http.StatusBadRequest, "Username is already taken")
 	}
 
-	//登録
+	//register
 	user, err := h.ui.CreateUser(u)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
+	//add new user to open chat , create session and cookie
 	err = h.ci.AddOpenChat(user.UserId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-
 	err = createSessionAndSetCookie(c, h, user.UserId)
 	if err != nil {
 		return err
@@ -86,24 +105,24 @@ func (h *Handler) SignUp(c echo.Context) error {
 }
 
 func (h *Handler) EditProfile(c echo.Context) error {
-	//入力取得
+	//get updated user input
 	u := new(model.UserUpdate)
 	err := validatedBind(c, u)
 	if err != nil {
 		return err
 	}
 
-	//セッション取得
+	//get user session
 	sess, err := h.PickSession(c)
 	if err != nil {
 		return err
 	}
 
-	//プロフィール更新
+	//update profile
 	newprofile, err := h.ui.EditUser(sess.UserId, u)
-	if err != nil { //DBエラー
+	if err != nil { //error for db
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-	} else if newprofile == nil { //パスワード不一致
+	} else if newprofile == nil { //incorrespond of password
 		return echo.NewHTTPError(http.StatusUnauthorized, "Incorrect password")
 	}
 
@@ -111,7 +130,7 @@ func (h *Handler) EditProfile(c echo.Context) error {
 }
 
 func (h *Handler) GetMyUser(c echo.Context) error {
-	//セッション取得
+	//get session
 	sess, err := h.PickSession(c)
 	if err != nil {
 		return err
