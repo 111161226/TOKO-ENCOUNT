@@ -34,6 +34,14 @@ paths:
       responses:
         '200':
           description: ログアウトに成功しました
+  
+  '/api/delete':
+    post:
+      summary: ログアウト
+      operationId: deleteMe
+      responses:
+        '200':
+          description: ログアウトに成功しました
 
   '/api/ws':
     get:

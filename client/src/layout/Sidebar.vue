@@ -22,6 +22,20 @@ const logout = async () => {
     showErrorMessage(err)
   }
 }
+
+const withdraw = async () => {
+  try {
+    await me.deleteMe()
+    ElMessage({
+      message: '退会しました',
+      type: 'success'
+    })
+    router.push({ name: 'Login' })
+  } catch (e: any) {
+    const err: AxiosError = e
+    showErrorMessage(err)
+  }
+}
 </script>
 
 <template>
@@ -40,6 +54,9 @@ const logout = async () => {
     </div>
     <div class="logout">
       <el-button class="button" @click="logout">Logout</el-button>
+    </div>
+    <div class="withdraw">
+      <el-button class="button" @click="withdraw">退会</el-button>
     </div>
   </div>
 </template>
