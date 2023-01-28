@@ -20,6 +20,11 @@ func (h *Handler) DeleteUser(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
+	//delete session
+	err = h.si.DeleteSessionBySessionId(sess.SessionId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
 
 	return c.NoContent(http.StatusOK)
 }

@@ -9,6 +9,7 @@ import { showErrorMessage } from '@/util/showErrorMessage'
 const router = useRouter()
 const me = useMe()
 
+//logout process
 const logout = async () => {
   try {
     await me.logout()
@@ -23,6 +24,7 @@ const logout = async () => {
   }
 }
 
+//delete user process
 const withdraw = async () => {
   try {
     await me.deleteMe()
