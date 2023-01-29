@@ -29,6 +29,42 @@ func (h *Handler) DeleteUser(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
+//check userdata was used
+func (h *Handler) CheckUser(c echo.Context) error {
+	u := new(model.UserSimple)
+	err := validatedBind(c, u)
+	if err != nil {
+		return err
+	}
+
+	//check if user can login
+	user, err := h.ui.CheckUsedUser(u.UserName, u.Password)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid name or password")
+	}
+	//if not present, not return nil
+	if user == nil {
+		return nil
+	}
+	return c.JSON(http.StatusOK, user)
+}
+
+//restore used user
+func (h *Handler) RestoreUser(c echo.Context) error {
+	u := new(model.UserSimple)
+	err := validatedBind(c, u)
+	if err != nil {
+		return err
+	}
+
+	//check if user can login
+	err = h.ui.RestoreUser(u.UserName)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid name or password")
+	}
+	return c.NoContent(http.StatusOK)
+}
+
 //func for logout
 func (h *Handler) Logout(c echo.Context) error {
 	//get userid by session

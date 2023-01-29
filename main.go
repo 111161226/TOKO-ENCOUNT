@@ -44,8 +44,8 @@ func main() {
 		api.GET("/user/me", h.GetMyUser)
 		api.PATCH("/user/me", h.EditProfile)
 		api.DELETE("/user/delete", h.DeleteUser)
-		api.GET("/check", h.NotImpl)
-		api.POST("/restore", h.NotImpl)
+		api.POST("/check", h.CheckUser)
+		api.POST("/restore", h.RestoreUser)
 
 		apiChat := api.Group("/chat")
 		{

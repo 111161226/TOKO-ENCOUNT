@@ -59,7 +59,7 @@ paths:
           description: Switching Protocols
   
   '/api/check':
-    get:
+    post:
       summary: ユーザーがすでに存在するか
       operationId: getUserPresent
       requestBody:
@@ -74,7 +74,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Old"
+                $ref: "#/components/schemas/UserWithoutPass"
   
   '/api/restore':
     post:
@@ -85,7 +85,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UserSimple"
+              type: object
+              properties:
+                userId:
+                  type: string
       responses:
         '200':
           description: ユーザーを復活させました
@@ -301,12 +304,6 @@ paths:
 
 components:
   schemas:
-    Old:
-      type: object
-      properties:
-        old: 
-          type: boolean
-          example: false
     User:
       type: object
       properties:

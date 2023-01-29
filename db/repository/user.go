@@ -8,6 +8,10 @@ type UserRepository interface {
 	EditUser(userId string, user *model.UserUpdate) (*model.UserWithoutPass, error)
 	//withdraw user by logic delete
 	DeleteUser(userId string) error
+	//check user data was used
+	CheckUsedUser(userName string, password string) (*model.UserWithoutPass, error)
+	//restore user data
+	RestoreUser(userId string) error
 	//check whether user can login
 	CheckRightUser(user *model.UserSimple) (*model.UserWithoutPass, error)
 	//check username is duplicated

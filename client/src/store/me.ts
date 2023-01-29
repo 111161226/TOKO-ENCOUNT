@@ -2,13 +2,9 @@ import { defineStore } from 'pinia'
 import api, { UserWithoutPass, UserSimple, User, UserUpdate } from '@/lib/apis'
 
 export const useMe = defineStore('me', {
-  state: (): { me: UserWithoutPass | undefined; old: boolean | undefined} => ({
-     me: undefined,
-     old: false 
-    }),
+  state: (): { me: UserWithoutPass | undefined } => ({ me: undefined }),
   getters: {
-    getMe: state => state.me,
-    getOld: state => state.old
+    getMe: state => state.me
   },
   actions: {
     async setMe() {
@@ -22,7 +18,6 @@ export const useMe = defineStore('me', {
     async logout() {
       await api.postLogout()
       this.me = undefined
-      this.old = undefined
     },
     async changeMeData(newData: UserUpdate) {
       if (!this.me) {
@@ -41,12 +36,11 @@ export const useMe = defineStore('me', {
     },
     async checkpresentMe(userData: UserSimple) {
       const { data } = await api.getUserPresent(userData)
-      this.old = data.old
+      this.me = data
     },
     async restoreMe(userData: UserSimple) {
-      await api.restoreUser(userData)
+      await api.restoreUser({ userId: this.me?.userId })
       this.login(userData)
-      this.old = false
     }
   }
 })
