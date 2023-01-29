@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { AxiosError } from 'axios'
-import { reactive, ref, watchEffect } from 'vue'
+import { reactive, ref, watchEffect, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, FormInstance } from 'element-plus'
 import { useMe } from '@/store/me'
@@ -36,6 +36,7 @@ const inputData = reactive<UserSimple>({
 })
 const loading = ref(false)
 const router = useRouter()
+const restore = computed(() => meStore.getOld)
 const login = async () => {
   if (!isFormValid.value) {
     return
@@ -43,6 +44,13 @@ const login = async () => {
 
   try {
     loading.value = true
+    await meStore.checkpresentMe(inputData)
+    if(restore.value) {
+      ElMessage({
+      message: 'アカウントを復活します',
+      type: 'warning'
+      })
+    }
     await meStore.login(inputData)
     ElMessage({
       message: 'ログインに成功しました',

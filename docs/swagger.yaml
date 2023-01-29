@@ -41,7 +41,7 @@ paths:
       operationId: deleteMe
       responses:
         '200':
-          description: ログアウトに成功しました
+          description: 退会しました
 
   '/api/ws':
     get:
@@ -57,6 +57,24 @@ paths:
       responses:
         '101':
           description: Switching Protocols
+  
+  '/api/check':
+    get:
+      summary: ユーザーがすでに存在するか
+      operationId: getUserPresent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserSimple"
+      responses:
+        '200':
+          description: すでにユーザーが存在します
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Old"
 
   '/api/user':
     post:
@@ -269,6 +287,12 @@ paths:
 
 components:
   schemas:
+    Old:
+      type: object
+      properties:
+        old: 
+          type: boolean
+          example: false
     User:
       type: object
       properties:
