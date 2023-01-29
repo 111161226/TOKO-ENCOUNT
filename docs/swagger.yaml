@@ -75,6 +75,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Old"
+  
+  '/api/restore':
+    post:
+      summary: ユーザーを復活させる
+      operationId: restoreUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserSimple"
+      responses:
+        '200':
+          description: ユーザーを復活させました
 
   '/api/user':
     post:

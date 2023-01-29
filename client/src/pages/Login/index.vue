@@ -45,10 +45,10 @@ const login = async () => {
   try {
     loading.value = true
     await meStore.checkpresentMe(inputData)
-    if(restore.value) {
+    if (restore.value) {
       ElMessage({
-      message: 'アカウントを復活します',
-      type: 'warning'
+        message: 'アカウントを復活します',
+        type: 'warning'
       })
     }
     await meStore.login(inputData)

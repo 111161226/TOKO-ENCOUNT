@@ -42,6 +42,11 @@ export const useMe = defineStore('me', {
     async checkpresentMe(userData: UserSimple) {
       const { data } = await api.getUserPresent(userData)
       this.old = data.old
+    },
+    async restoreMe(userData: UserSimple) {
+      await api.restoreUser(userData)
+      this.login(userData)
+      this.old = false
     }
   }
 })
