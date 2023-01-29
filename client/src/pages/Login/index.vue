@@ -36,7 +36,7 @@ const inputData = reactive<UserSimple>({
 })
 const loading = ref(false)
 const router = useRouter()
-const restore = computed(() => meStore.getOld)
+const restore = computed(() => meStore.getMe)
 const login = async () => {
   if (!isFormValid.value) {
     return
@@ -50,12 +50,13 @@ const login = async () => {
         message: 'アカウントを復活します',
         type: 'warning'
       })
+    } else {
+      await meStore.login(inputData)
+      ElMessage({
+        message: 'ログインに成功しました',
+        type: 'success'
+      })
     }
-    await meStore.login(inputData)
-    ElMessage({
-      message: 'ログインに成功しました',
-      type: 'success'
-    })
     router.push({ name: 'Home' })
   } catch (e: any) {
     const err: AxiosError = e
