@@ -43,7 +43,7 @@ func main() {
 		api.POST("/user", h.SignUp)
 		api.GET("/user/me", h.GetMyUser)
 		api.PATCH("/user/me", h.EditProfile)
-		api.DELETE("/user/delete", h.DeleteUser)
+		api.DELETE("/delete", h.DeleteUser)
 		api.POST("/check", h.CheckUser)
 		api.POST("/restore", h.RestoreUser)
 

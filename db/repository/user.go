@@ -11,7 +11,7 @@ type UserRepository interface {
 	//check user data was used
 	CheckUsedUser(userName string, password string) (*model.UserWithoutPass, error)
 	//restore user data
-	RestoreUser(userId string) error
+	RestoreUser(userName string) error
 	//check whether user can login
 	CheckRightUser(user *model.UserSimple) (*model.UserWithoutPass, error)
 	//check username is duplicated

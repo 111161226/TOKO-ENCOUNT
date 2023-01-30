@@ -16,7 +16,7 @@ func (h *Handler) DeleteUser(c echo.Context) error {
 		return err
 	}
 	//delete user
-	err = h.ui.DeleteUser(sess.SessionId)
+	err = h.ui.DeleteUser(sess.UserId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

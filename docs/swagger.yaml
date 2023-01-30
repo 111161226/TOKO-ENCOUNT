@@ -37,7 +37,7 @@ paths:
   
   '/api/delete':
     delete:
-      summary: ログアウト
+      summary: 退会
       operationId: deleteMe
       responses:
         '200':

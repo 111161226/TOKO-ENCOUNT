@@ -70,12 +70,12 @@ func (ui *userInfra) CheckUsedUser(userName string, password string) (*model.Use
 }
 
 //restore user
-func (ui *userInfra) RestoreUser(userId string) error {
+func (ui *userInfra) RestoreUser(userName string) error {
 	//update DB
 	_, err := ui.db.Exec(
-		"UPDATE `user_deletes` SET `flag` = ? WHERE `user_id` = ?",
-		1,
-		userId,
+		"UPDATE `user_deletes` SET `flag` = ? WHERE `user_name` = ?",
+		0,
+		userName,
 	)
 	if err != nil {
 		return  err
