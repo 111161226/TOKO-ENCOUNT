@@ -32,6 +32,8 @@ func main() {
 	e.Static("/api/swagger-ui", "./docs/swagger-ui/dist")
 
 	e.POST("/api/login", h.Login)
+	e.POST("/api/check", h.CheckUser)
+	e.POST("/api/restore", h.RestoreUser)
 
 	api := e.Group("/api", mid.EnsureAuthorized(h))
 	{
@@ -44,8 +46,6 @@ func main() {
 		api.GET("/user/me", h.GetMyUser)
 		api.PATCH("/user/me", h.EditProfile)
 		api.DELETE("/delete", h.DeleteUser)
-		api.POST("/check", h.CheckUser)
-		api.POST("/restore", h.RestoreUser)
 
 		apiChat := api.Group("/chat")
 		{
