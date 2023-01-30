@@ -34,4 +34,4 @@ RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSI
 COPY --from=client-build /github.com/111161226/TOKO-ENCOUNT/client/dist ./web/dist
 COPY --from=server-build /go/src/github.com/111161226/TOKO-ENCOUNT ./
 COPY --from=server-build /docs/swagger-ui/dist ./docs/swagger-ui/dist
-ENTRYPOINT ./SakataKintoki
+ENTRYPOINT ./TOKO-ENCOUNT

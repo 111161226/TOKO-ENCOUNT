@@ -3,7 +3,7 @@ services:
   tokoencount:
     build: ./
     entrypoint: dockerize -timeout 60s -wait tcp://mysql:3306
-    command: ./SakataKintoki
+    command: ./TOKO-ENCOUNT
     ports:
       - 3050:80
     depends_on:
