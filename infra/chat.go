@@ -26,7 +26,7 @@ func (ci *chatInfra) PostChat(roomId string, message *model.MessageSimple, post_
 	chatId := ch.String()
 	//insert message into chats db
 	_, err = ci.db.Exec(
-		"INSERT INTO `chats` (`chat_id`, `room_id`, `post`, `post_user_id`) VALUES (?, ?, ?, ?, ?)",
+		"INSERT INTO `chats` (`chat_id`, `room_id`, `post`, `post_user_id`) VALUES (?, ?, ?, ?)",
 		chatId,
 		roomId,
 		message.Post,

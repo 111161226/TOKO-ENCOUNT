@@ -58,8 +58,8 @@ UNLOCK TABLES;
 
 LOCK TABLES `chats` WRITE;
 /*!40000 ALTER TABLE `chats` DISABLE KEYS */;
-INSERT INTO `chats` (`chat_id`, `room_id`, `destination_user_id`, `post`, `post_user_id`)
+INSERT INTO `chats` (`chat_id`, `room_id`, `post`, `post_user_id`)
 VALUES
-  ('0', '0', '0', 'This is general chat.', 'system');
+  ('0', '0', 'This is general chat.', 'system');
 /*!40000 ALTER TABLE `chats` ENABLE KEYS */;
 UNLOCK TABLES;

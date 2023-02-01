@@ -18,15 +18,18 @@ const storeRoomUser = useroomUsers()
 const route = useRoute()
 const roomId = route.params.id as string
 
-const otherUser = reactive({ userId: '', userName: '' })
+const roomUsers = computed(() => storeRoomUser.getUser(roomId))
 const messages = computed(() => messageStore.getMessage(roomId).messages)
 const contentDivRef = ref<HTMLDivElement>()
+const roomName = reactive({
+  name: ''
+})
 
 const onSubmit = async () => {
   const message = draftMessageStore.getMessage(roomId)
   if (message) {
     try {
-      await messageStore.sendMessage(roomId, otherUser.userId, message)
+      await messageStore.sendMessage(roomId, message)
       draftMessageStore.setMessage(roomId, '')
     } catch (e: any) {
       const err: AxiosError = e
@@ -50,21 +53,23 @@ onMounted(async () => {
   }
 
   if (roomId == '0') {
-    otherUser.userName = '全体チャット'
-    otherUser.userId = '0'
+    roomName.name = '全体チャット'
   } else {
-    if (!storeRoomUser.getUser(roomId)?.userId) {
+    if (!roomUsers.value) {
+      const tmp: string[] = []
       for (const message of messages.value) {
-        if (message.postUserId !== storeMe.getMe?.userId) {
-          otherUser.userName = message.userName
-          otherUser.userId = message.postUserId
-          storeRoomUser.setUser(roomId, message.userName, message.postUserId)
+        if (message.postUserId != storeMe.getMe?.userId) {
+          if (tmp.indexOf(message.postUserId) == 1) {
+            roomName.name += message.userName + " "
+            storeRoomUser.setUser(roomId, message.userName, message.postUserId)
+            tmp.push(message.postUserId)
+          }
+          storeRoomUser.setRoomName(roomId, roomName.name)
           break
         }
       }
     } else {
-      otherUser.userName = storeRoomUser.getUser(roomId)?.userName
-      otherUser.userId = storeRoomUser.getUser(roomId)?.userId
+      roomName.name = storeRoomUser.getRoom(roomId)
     }
   }
 
@@ -78,13 +83,13 @@ onMounted(async () => {
 <template>
   <div class="chat-container">
     <div class="header">
-      {{ otherUser.userName }}
+      {{ roomName.name }}
     </div>
     <div class="content" ref="contentDivRef">
       <message-list
         :room-id="roomId"
         :messages="messages"
-        :show-user-name="roomId === '0'"
+        :show-user-name="true"
       />
     </div>
     <div class="input-container">
