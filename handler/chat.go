@@ -30,7 +30,7 @@ func (h *Handler) ChatPost(c echo.Context) error {
 	}
 
 	//send message
-	postedMessage, err := h.ci.PostChat(rid, did, post, sess.UserId)
+	postedMessage, err := h.ci.PostChat(rid, post, sess.UserId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

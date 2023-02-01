@@ -23,7 +23,6 @@ DROP TABLE IF EXISTS `chats`;
 CREATE TABLE `chats` (
   `chat_id` VARCHAR(37) NOT NULL,
   `room_id` VARCHAR(37) NOT NULL, -- 全体チャットは0
-  `destination_user_id` VARCHAR(37) NOT NULL, -- 全体チャットは0
   `post` VARCHAR(100) NOT NULL,
   `post_user_id`  VARCHAR(37) NOT NULL,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
