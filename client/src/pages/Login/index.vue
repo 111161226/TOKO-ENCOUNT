@@ -46,18 +46,17 @@ const login = async () => {
     loading.value = true
     await meStore.checkpresentMe(inputData)
     if (restore.value) {
-      await meStore.restoreMe(inputData)
+      await meStore.restoreMe()
       ElMessage({
         message: 'アカウントを復活します',
         type: 'warning'
       })
-    } else {
-      await meStore.login(inputData)
-      ElMessage({
-        message: 'ログインに成功しました',
-        type: 'success'
-      })
     }
+    await meStore.login(inputData)
+    ElMessage({
+      message: 'ログインに成功しました',
+      type: 'success'
+    })
     router.push({ name: 'Home' })
   } catch (e: any) {
     const err: AxiosError = e

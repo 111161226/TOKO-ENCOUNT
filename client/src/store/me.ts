@@ -38,9 +38,8 @@ export const useMe = defineStore('me', {
       const { data } = await api.getUserPresent(userData)
       this.me = data
     },
-    async restoreMe(userData: UserSimple) {
-      await api.restoreUser({ userId: this.me?.userId })
-      this.login(userData)
+    async restoreMe() {
+      await api.restoreUser({ userName: this.me?.userName })
     }
   }
 })

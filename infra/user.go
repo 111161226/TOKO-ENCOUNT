@@ -58,11 +58,16 @@ func (ui *userInfra) CheckUsedUser(userName string, password string) (*model.Use
 	//get user data
 	var user model.UserWithoutPass
 	err := ui.db.Get(
-		&user, "SELECT `user_id`, `user_name`, `prefect`, `gender` FROM `users` WHERE `user_name` = ? AND `password` = ?",
+		&user, "SELECT `users`.`user_id`, `users`.`user_name`, `users`.`prefect`, `users`.`gender` FROM `users` INNER JOIN `user_deletes` ON `users`.`user_name` = `user_deletes`.`user_name` WHERE `users`.`user_name` = ? AND `users`.`password` = ? AND `user_deletes`.`flag` = ?",
 		userName,
 		hash(password),
+		1,
 	)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			//in case no one uses the username, that is not error 
+			return nil, nil
+		}
 		return nil, err
 	}
 
