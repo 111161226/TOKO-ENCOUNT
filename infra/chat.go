@@ -162,6 +162,7 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 	}
 
 	//select userId user name is needed
+	idRoomMap := map[string][]string{}
 	ids := []string{}
 	for _, m := range messages {
 		if m.RoomId == "0" { // case open chat
@@ -173,7 +174,17 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 
 		if m.UserId == userId {
 			//when the latest message is not sent by me
-			ids = append(ids, m.UserId)
+			var userids []string
+			err = ci.db.Select(
+				&userids,
+				"SELECT `user_id` FROM `room_datas` WHERE `room_id` = ? AND `user_id` != ?",
+				m.RoomId,
+				m.UserId,
+			)
+			for _, id := range userids {
+				idRoomMap[m.RoomId] = append(idRoomMap[m.RoomId], id)
+				ids = append(ids, id)
+			}
 		} else {
 			//when the latest message is sent by me
 			ids = append(ids, m.UserId)
@@ -204,7 +215,11 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 			name = "全体チャット"
 		} else if m.UserId == userId {
 			//when the latest message is sent by me
-			name = idNameMap[m.UserId]
+			tmp := ""
+			for _, id := range idRoomMap[m.RoomId] {
+				tmp += idNameMap[id] + ", "
+			}
+			name = tmp
 		}
 		c := &model.ChatData{
 			RoomId:          m.RoomId,

@@ -87,7 +87,7 @@ paths:
             schema:
               type: object
               properties:
-                userName:
+                username:
                   type: string
       responses:
         '200':
@@ -278,13 +278,6 @@ paths:
           schema:
             type: string
             format: uuid
-        - name: did
-          in: query
-          required: true
-          description: 送信相手のユーザーID(全体チャットは0)
-          schema:
-            type: string
-            format: uuid
       requestBody:
         required: true
         content:
@@ -301,12 +294,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Message"
-  
+      
   /api/chat/{rid}/add:  
     post:
       tags:
         - chat
-      summary: ridにメッセージを送信
+      summary: ridにメンバーを追加
       operationId: addChat
       parameters:
         - name: rid
@@ -330,7 +323,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ChatData"
-
+                
 components:
   schemas:
     User:
