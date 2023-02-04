@@ -18,10 +18,18 @@ export const useroomUsers = defineStore('roomUsers', {
   },
   actions: {
     setUser(roomId: string, userName: string, userId: string) {
-      this.users[roomId].push({
-        userId: userId,
-        userName: userName
-      })
+      if (!this.users[roomId]) {
+        this.users = {
+          ...this.users,
+          [roomId]: [{ userId: userId, userName: userName }]
+        }
+        return
+      }
+      const prevData = this.users[roomId]
+      this.users = {
+        ...this.users,
+        [roomId]: prevData.concat({ userId: userId, userName: userName })
+      }
     },
     setRoomName(roomId: string, name: string) {
       this.roomnames = { ...this.roomnames, [roomId]: name }

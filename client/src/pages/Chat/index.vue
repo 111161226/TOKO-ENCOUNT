@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { AxiosError } from 'axios'
-import { onMounted, ref, reactive, computed } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useMe } from '@/store/me'
 import { useMessages } from '@/store/message'
@@ -18,12 +18,9 @@ const storeRoomUser = useroomUsers()
 const route = useRoute()
 const roomId = route.params.id as string
 
-const roomUsers = computed(() => storeRoomUser.getUser(roomId))
 const messages = computed(() => messageStore.getMessage(roomId).messages)
 const contentDivRef = ref<HTMLDivElement>()
-const roomName = reactive({
-  name: ''
-})
+const roomName = computed(() => storeRoomUser.getRoom(roomId))
 
 const onSubmit = async () => {
   const message = draftMessageStore.getMessage(roomId)
@@ -52,24 +49,20 @@ onMounted(async () => {
     }
   }
 
-  if (roomId == '0') {
-    roomName.name = '全体チャット'
-  } else {
-    if (!roomUsers.value) {
+  if (roomId != '0') {
+    if (!roomName.value) {
       const tmp: string[] = []
       for (const message of messages.value) {
         if (message.postUserId != storeMe.getMe?.userId) {
           if (tmp.indexOf(message.postUserId) == 1) {
-            roomName.name += message.userName + " "
+            roomName.value = message.userName
             storeRoomUser.setUser(roomId, message.userName, message.postUserId)
             tmp.push(message.postUserId)
           }
-          storeRoomUser.setRoomName(roomId, roomName.name)
+          storeRoomUser.setRoomName(roomId, roomName.value)
           break
         }
       }
-    } else {
-      roomName.name = storeRoomUser.getRoom(roomId)
     }
   }
 
@@ -82,8 +75,9 @@ onMounted(async () => {
 
 <template>
   <div class="chat-container">
-    <div class="header">
-      {{ roomName.name }}
+    <div class="header" v-if="roomId === '0'">全体チャット</div>
+    <div class="header" v-else>
+      {{ roomName.value }}
     </div>
     <div class="content" ref="contentDivRef">
       <message-list
