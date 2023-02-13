@@ -1,38 +1,23 @@
 import { defineStore } from 'pinia'
-
-interface RoomUser {
-  userId: string
-  userName: string
-}
+import apis from '@/lib/apis'
 
 export const useroomUsers = defineStore('roomUsers', {
-  state: (): { users: Record<string, RoomUser[]>; roomnames: Record<string, string> } => ({
-    users: {},
+  state: (): { roomnames: Record<string, string> } => ({
     roomnames: {}
   }),
   getters: {
-    getUsers: state => state.users,
-    getUser: state => (roomId: string) => state.users?.[roomId],
     getRooms: state => state.roomnames,
     getRoom: state => (roomId: string) => state.roomnames?.[roomId]
   },
   actions: {
-    setUser(roomId: string, userName: string, userId: string) {
-      if (!this.users[roomId]) {
-        this.users = {
-          ...this.users,
-          [roomId]: [{ userId: userId, userName: userName }]
-        }
-        return
-      }
-      const prevData = this.users[roomId]
-      this.users = {
-        ...this.users,
-        [roomId]: prevData.concat({ userId: userId, userName: userName })
-      }
-    },
     setRoomName(roomId: string, name: string) {
       this.roomnames = { ...this.roomnames, [roomId]: name }
+    },
+    async fetchRoomName(roomId: string) {
+      if (!this.roomnames[roomId]) {
+        const { data } = await apis.getRoomName(roomId)
+        this.roomnames[roomId] = data.name
+      }
     }
   }
 })
