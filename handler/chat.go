@@ -125,6 +125,18 @@ func (h *Handler) AddChatUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, roomData)
 }
 
+//get current room name
+func (h *Handler) GetroomName(c echo.Context) error {
+	rid := c.Param("rid")
+	room, err := h.ci.GetRoomName(rid)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, room)
+}
+
+
 //get current chat message
 func (h *Handler) GetMessages(c echo.Context) error {
 	rid := c.Param("rid")

@@ -341,6 +341,18 @@ func (ci *chatInfra) AddPrivateChat(roomId string, did string) (*model.ChatData,
 	}, nil
 } 
 
+//get room name 
+func (ci *chatInfra) GetRoomName(roomId string) (*model.RoomInfo, error) {
+	//get room info
+	room := model.RoomInfo{}
+	err := ci.db.Get(
+		&room,
+		"SELECT `room_id`, `room_name` FROM `room_names` WHERE `room_id` = ? ",
+		roomId,
+	)
+	return &room, err
+}
+
 //add new user to open chat 
 func (ci *chatInfra) AddOpenChat(userId string) error {
 	_, err := ci.db.Exec(

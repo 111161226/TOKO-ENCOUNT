@@ -13,4 +13,5 @@ type ChatRepository interface {
 	ResetNotRead(roomId string, userId string) error
 	/** roomId に参加している userId 以外の全ユーザーの未読数をインクリメントする */
 	IncrementNotRead(roomId string, userId string) error
+	GetRoomName(roomId string) (*model.RoomInfo, error)
 }

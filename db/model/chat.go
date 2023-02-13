@@ -46,3 +46,9 @@ type ChatUser struct {
 type ChatUserList struct {
 	ChatUsers *[]*ChatUser `json:"chatusers"`
 }
+
+//struct for room name
+type RoomInfo struct {
+	RoomId string `json:"roomId" db:"room_id"`
+	Name   string `json:"roomName" db:"room_name"`
+}
