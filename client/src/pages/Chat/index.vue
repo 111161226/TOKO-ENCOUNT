@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { AxiosError } from 'axios'
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, reactive } from 'vue'
 import { useRoute } from 'vue-router'
-import { useMe } from '@/store/me'
+//import { useMe } from '@/store/me'
 import { useMessages } from '@/store/message'
 import { useDraftMessages } from '@/store/draftMessage'
 import { useroomUsers } from '@/store/roomUser'
@@ -10,7 +10,7 @@ import { showErrorMessage } from '@/util/showErrorMessage'
 import ChatInput from './components/ChatInput.vue'
 import MessageList from './components/MessageList.vue'
 
-const storeMe = useMe()
+//const storeMe = useMe()
 const draftMessageStore = useDraftMessages()
 const messageStore = useMessages()
 const storeRoomUser = useroomUsers()
@@ -20,7 +20,8 @@ const roomId = route.params.id as string
 
 const messages = computed(() => messageStore.getMessage(roomId).messages)
 const contentDivRef = ref<HTMLDivElement>()
-const roomName = computed(() => storeRoomUser.getRoom(roomId))
+const roomName = reactive({ name: '' })
+const roominfo = computed(() => storeRoomUser.getRoom(roomId))
 
 const onSubmit = async () => {
   const message = draftMessageStore.getMessage(roomId)
@@ -50,20 +51,9 @@ onMounted(async () => {
   }
 
   if (roomId != '0') {
-    if (!roomName.value) {
-      const tmp: string[] = []
-      for (const message of messages.value) {
-        if (message.postUserId != storeMe.getMe?.userId) {
-          if (tmp.indexOf(message.postUserId) == 1) {
-            roomName.value = message.userName
-            storeRoomUser.setUser(roomId, message.userName, message.postUserId)
-            tmp.push(message.postUserId)
-          }
-          storeRoomUser.setRoomName(roomId, roomName.value)
-          break
-        }
-      }
-    }
+    roomName.name = roominfo.value
+  } else {
+    roomName.name = `全体チャット`
   }
 
   if (contentDivRef.value) {
@@ -75,9 +65,8 @@ onMounted(async () => {
 
 <template>
   <div class="chat-container">
-    <div class="header" v-if="roomId === '0'">全体チャット</div>
-    <div class="header" v-else>
-      {{ roomName.value }}
+    <div class="header">
+      {{ roomName.name }}
     </div>
     <div class="content" ref="contentDivRef">
       <message-list
