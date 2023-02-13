@@ -39,6 +39,14 @@ CREATE TABLE `room_datas` (
   PRIMARY KEY (`room_id`, `user_id`)
 );
 
+-- db for room name
+DROP TABLE IF EXISTS `room_names`;
+CREATE TABLE `room_names` (
+  `room_id` VARCHAR(37) NOT NULL,
+  `room_name` VARCHAR(30) NOT NULL,
+  PRIMARY KEY (`room_id`)
+);
+
 -- db for session info
 DROP TABLE IF EXISTS `sessions`;
 CREATE TABLE `sessions` (
