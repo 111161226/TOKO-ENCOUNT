@@ -126,9 +126,20 @@ func (ci *chatInfra) CreateChat(destinationId string, post_user_id string) (*mod
 		return nil, err
 	}
 
+	//add room name
+	var roomname = post_user_name + " " + name
+	_, err = ci.db.Exec(
+		"INSERT INTO `room_names` (`room_id`, `room_name`) VALUES (?, ?)",
+		roomId,
+		roomname,
+	)
+	if err != nil {
+		return nil, err
+	}
+
 	return &model.ChatData{
 		RoomId:          roomId,
-		Name:            name,
+		Name:            roomname,
 		LatestMessage:   *m,
 		NewMessageCount: 0,
 	}, nil
@@ -298,6 +309,25 @@ func (ci *chatInfra) AddPrivateChat(roomId string, did string) (*model.ChatData,
 		&name,
 		"SELECT `user_name` FROM `users` WHERE `user_id` = ?",
 		did,
+	)
+	if err != nil {
+		return nil, err
+	}
+	//get current username
+	var curname string
+	err = ci.db.Get(
+		&curname,
+		"SELECT `room_name` FROM `room_names` WHERE `room_id` = ?",
+		roomId,
+	)
+	if err != nil {
+		return nil, err
+	}
+	//update room name
+	_, err = ci.db.Exec(
+		"UPDATE `room_names` SET `room_name` = ? WHERE room_id = ?",
+		curname+" " + name,
+		roomId,
 	)
 	if err != nil {
 		return nil, err
