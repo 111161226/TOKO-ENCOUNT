@@ -126,12 +126,26 @@ func (ui *userInfra) CreateUser(user *model.User) (*model.UserWithoutPass, error
 	}, nil
 }
 
-func (ui *userInfra) GetUser(userId string) (*model.UserWithoutPass, error) {
+func (ui *userInfra) GetUserByUserId(userId string) (*model.UserWithoutPass, error) {
 	//get user data
 	var user model.UserWithoutPass
 	err := ui.db.Get(
 		&user, "SELECT `user_id`, `user_name`, `prefect`, `gender` FROM `users` WHERE `user_id` = ?",
 		userId,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (ui *userInfra) GetUserByUserName(userName string) (*model.UserWithoutPass, error) {
+	//get user data
+	var user model.UserWithoutPass
+	err := ui.db.Get(
+		&user, "SELECT `user_id`, `user_name`, `prefect`, `gender` FROM `users` WHERE `user_name` = ?",
+		userName,
 	)
 	if err != nil {
 		return nil, err

@@ -56,6 +56,8 @@ func main() {
 			{
 				apiRoomId.POST("", h.ChatPost)
 				apiRoomId.GET("", h.GetMessages)
+				apiRoomId.POST("add", h.AddChatUser)
+				apiRoomId.GET("name", h.NotImpl)
 			}
 		}
 	}

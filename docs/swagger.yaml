@@ -294,6 +294,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Message"
+  
+  /api/chat/{rid}/name:  
+    get:
+      tags:
+        - chat
+      summary: ridのルーム名を取得
+      operationId: getRoomName
+      parameters:
+        - name: rid
+          in: path
+          required: true
+          description: ルームID(全体チャットは0)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: ルーム名取得
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomInfo"
       
   /api/chat/{rid}/add:  
     post:
@@ -473,6 +495,17 @@ components:
         - name
         - latestMessage
         - newMessageCount
+    
+    RoomInfo:
+      type: object
+      properties:
+        roomId:
+          type: string
+        name:
+          type: string
+      required:
+        - roomId
+        - name
 
     ChatList:
       type: object

@@ -178,7 +178,7 @@ func (h *Handler) GetMyUser(c echo.Context) error {
 	}
 
 	//get my user info
-	user, err := h.ui.GetUser(sess.UserId)
+	user, err := h.ui.GetUserByUserId(sess.UserId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

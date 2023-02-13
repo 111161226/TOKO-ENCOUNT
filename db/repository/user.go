@@ -4,7 +4,8 @@ import "github.com/111161226/TOKO-ENCOUNT/db/model"
 
 type UserRepository interface {
 	CreateUser(user *model.User) (*model.UserWithoutPass, error)
-	GetUser(userId string) (*model.UserWithoutPass, error)
+	GetUserByUserId(userId string) (*model.UserWithoutPass, error)
+	GetUserByUserName(userName string) (*model.UserWithoutPass, error)
 	EditUser(userId string, user *model.UserUpdate) (*model.UserWithoutPass, error)
 	//withdraw user by logic delete
 	DeleteUser(userId string) error
