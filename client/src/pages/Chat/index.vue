@@ -5,7 +5,7 @@ import { useRoute } from 'vue-router'
 //import { useMe } from '@/store/me'
 import { useMessages } from '@/store/message'
 import { useDraftMessages } from '@/store/draftMessage'
-import { useroomUsers } from '@/store/roomUser'
+import { useroomNames } from '@/store/roomName'
 import { showErrorMessage } from '@/util/showErrorMessage'
 import ChatInput from './components/ChatInput.vue'
 import MessageList from './components/MessageList.vue'
@@ -13,7 +13,7 @@ import MessageList from './components/MessageList.vue'
 //const storeMe = useMe()
 const draftMessageStore = useDraftMessages()
 const messageStore = useMessages()
-const storeRoomUser = useroomUsers()
+const storeRoom = useroomNames()
 
 const route = useRoute()
 const roomId = route.params.id as string
@@ -21,7 +21,7 @@ const roomId = route.params.id as string
 const messages = computed(() => messageStore.getMessage(roomId).messages)
 const contentDivRef = ref<HTMLDivElement>()
 const roomName = reactive({ name: '' })
-const roominfo = computed(() => storeRoomUser.getRoom(roomId))
+const roominfo = computed(() => storeRoom.getRoom(roomId))
 
 const onSubmit = async () => {
   const message = draftMessageStore.getMessage(roomId)
@@ -49,7 +49,9 @@ onMounted(async () => {
       messageStore.setLoading(false)
     }
   }
-
+  if (!roominfo.value) {
+    storeRoom.fetchRoomName(roomId)
+  }
   if (roomId != '0') {
     roomName.name = roominfo.value
   } else {

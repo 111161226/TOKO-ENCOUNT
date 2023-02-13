@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import apis from '@/lib/apis'
 
-export const useroomUsers = defineStore('roomUsers', {
+export const useroomNames = defineStore('roomUsers', {
   state: (): { roomnames: Record<string, string> } => ({
     roomnames: {}
   }),
