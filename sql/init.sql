@@ -43,7 +43,7 @@ CREATE TABLE `room_datas` (
 DROP TABLE IF EXISTS `room_names`;
 CREATE TABLE `room_names` (
   `room_id` VARCHAR(37) NOT NULL,
-  `room_name` VARCHAR(30) NOT NULL,
+  `room_name` VARCHAR(100) NOT NULL,
   PRIMARY KEY (`room_id`)
 );
 
@@ -70,4 +70,12 @@ INSERT INTO `chats` (`chat_id`, `room_id`, `post`, `post_user_id`)
 VALUES
   ('0', '0', 'This is general chat.', 'system');
 /*!40000 ALTER TABLE `chats` ENABLE KEYS */;
+UNLOCK TABLES;
+
+LOCK TABLES `room_names` WRITE;
+/*!40000 ALTER TABLE `room_names` DISABLE KEYS */;
+INSERT INTO `room_names` (`room_id`, `room_name`)
+VALUES
+  ('0', N'全体チャット');
+/*!40000 ALTER TABLE `room_names` ENABLE KEYS */;
 UNLOCK TABLES;

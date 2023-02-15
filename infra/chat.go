@@ -61,7 +61,7 @@ func (ci *chatInfra) GetMessages(roomId string, limit int, offset int) (*model.M
 	if err != nil {
 		return nil, err
 	}
-	//get total of message 
+	//get total of message
 	count := 0
 	err = ci.db.Get(
 		&count,
@@ -127,9 +127,9 @@ func (ci *chatInfra) CreateChat(destinationId string, post_user_id string) (*mod
 	}
 
 	//add room name
-	var roomname = post_user_name + " " + name
+	var roomname = post_user_name + "," + name
 	_, err = ci.db.Exec(
-		"INSERT INTO `room_names` (`room_id`, `room_name`) VALUES (?, ?)",
+		"INSERT INTO `room_names` (`room_id`, `room_name`) VALUES (?, N?)",
 		roomId,
 		roomname,
 	)
@@ -148,8 +148,8 @@ func (ci *chatInfra) CreateChat(destinationId string, post_user_id string) (*mod
 func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.ChatList, error) {
 	type MessageDetail struct {
 		model.Message
-		RoomId            string `db:"room_id"`
-		NotRead           int    `db:"not_read"`
+		RoomId  string `db:"room_id"`
+		NotRead int    `db:"not_read"`
 	}
 	messages := []MessageDetail{}
 	//get my joined rooms and those latest message
@@ -326,7 +326,7 @@ func (ci *chatInfra) AddPrivateChat(roomId string, did string) (*model.ChatData,
 	//update room name
 	_, err = ci.db.Exec(
 		"UPDATE `room_names` SET `room_name` = ? WHERE room_id = ?",
-		curname+" " + name,
+		curname+" "+name,
 		roomId,
 	)
 	if err != nil {
@@ -339,9 +339,9 @@ func (ci *chatInfra) AddPrivateChat(roomId string, did string) (*model.ChatData,
 		LatestMessage:   *m,
 		NewMessageCount: 0,
 	}, nil
-} 
+}
 
-//get room name 
+//get room name
 func (ci *chatInfra) GetRoomName(roomId string) (*model.RoomInfo, error) {
 	//get room info
 	room := model.RoomInfo{}
@@ -353,7 +353,7 @@ func (ci *chatInfra) GetRoomName(roomId string) (*model.RoomInfo, error) {
 	return &room, err
 }
 
-//add new user to open chat 
+//add new user to open chat
 func (ci *chatInfra) AddOpenChat(userId string) error {
 	_, err := ci.db.Exec(
 		"INSERT INTO `room_datas` (`room_id`, `user_id`) VALUES (0, ?)",

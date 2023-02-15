@@ -2,8 +2,9 @@ import { defineStore } from 'pinia'
 import apis from '@/lib/apis'
 
 export const useroomNames = defineStore('roomUsers', {
-  state: (): { roomnames: Record<string, string> } => ({
-    roomnames: {}
+  state: (): { roomnames: Record<string, string>; loading: boolean } => ({
+    roomnames: {},
+    loading: false
   }),
   getters: {
     getRooms: state => state.roomnames,
@@ -13,11 +14,12 @@ export const useroomNames = defineStore('roomUsers', {
     setRoomName(roomId: string, name: string) {
       this.roomnames = { ...this.roomnames, [roomId]: name }
     },
+    setLoading(value: boolean) {
+      this.loading = value
+    },
     async fetchRoomName(roomId: string) {
-      if (!this.roomnames[roomId]) {
-        const { data } = await apis.getRoomName(roomId)
-        this.roomnames[roomId] = data.name
-      }
+      const { data } = await apis.getRoomName(roomId)
+      this.roomnames = { ...this.roomnames, [roomId]: data.name }
     }
   }
 })

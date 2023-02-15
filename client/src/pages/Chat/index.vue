@@ -20,8 +20,7 @@ const roomId = route.params.id as string
 
 const messages = computed(() => messageStore.getMessage(roomId).messages)
 const contentDivRef = ref<HTMLDivElement>()
-const roomName = reactive({ name: '' })
-const roominfo = computed(() => storeRoom.getRoom(roomId))
+const roominfo = reactive({ name: '' })
 
 const onSubmit = async () => {
   const message = draftMessageStore.getMessage(roomId)
@@ -49,14 +48,18 @@ onMounted(async () => {
       messageStore.setLoading(false)
     }
   }
-  if (!roominfo.value) {
-    storeRoom.fetchRoomName(roomId)
+
+  try {
+    storeRoom.setLoading(true)
+    await storeRoom.fetchRoomName(roomId)
+  } catch (e: any) {
+    const err: AxiosError = e
+    showErrorMessage(err)
+  } finally {
+    storeRoom.setLoading(false)
   }
-  if (roomId != '0') {
-    roomName.name = roominfo.value
-  } else {
-    roomName.name = `全体チャット`
-  }
+
+  roominfo.name = storeRoom.getRoom(roomId)
 
   if (contentDivRef.value) {
     // scroll to bottom
@@ -68,7 +71,7 @@ onMounted(async () => {
 <template>
   <div class="chat-container">
     <div class="header">
-      {{ roomName.name }}
+      {{ roominfo.name }}
     </div>
     <div class="content" ref="contentDivRef">
       <message-list
