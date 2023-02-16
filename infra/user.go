@@ -294,19 +294,16 @@ func (ui *userInfra) GetUserList(limit int, offset int, name string, gender stri
 }
 
 //get users by roomid
-func (ui *userInfra) GetRoomUsers(roomId string, userId string) (*model.UserList, error) {
-	users := []*model.UserWithoutPass{}
+func (ui *userInfra) GetRoomUsers(roomId string, userId string) (*[]string, error) {
+	users := []string{}
 	err := ui.db.Select(
 		&users,
-		"SELECT `users`.`user_id`, `users`.`user_name`, `users`.`prefect`, `users`.`gender` FROM `users` INNER JOIN `room_datas` ON `room_datas`.`user_id` = `users`.`user_id` WHERE `room_datas`.`room_id` = ? AND `users`.`user_id` != ?",
+		"SELECT `users`.`user_id` FROM `users` INNER JOIN `room_datas` ON `room_datas`.`user_id` = `users`.`user_id` WHERE `room_datas`.`room_id` = ? AND `users`.`user_id` != ?",
 		roomId,
 		userId,
 	)
 	if err != nil {
 		return nil, err
 	}
-	return &model.UserList{
-		HasNext: false,
-		Users: &users,
-	}, nil
+	return &users, nil
 }

@@ -36,7 +36,15 @@ func (h *Handler) ChatPost(c echo.Context) error {
 	}
 
 	//notify new message to talk opponent
-	err = h.ws.NotifyNewMessage([]string{did}, rid, postedMessage)
+	if(rid == "0") {
+		err = h.ws.NotifyNewMessage([]string{did}, rid, postedMessage)
+	} else {
+		users, err := h.ui.GetRoomUsers(rid, sess.UserId)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}	
+		err = h.ws.NotifyNewMessage(*users, rid, postedMessage)
+	}
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

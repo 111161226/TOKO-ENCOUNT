@@ -47,7 +47,7 @@ export const useMessages = defineStore('messages', {
       if (!this.messages[roomId]) {
         this.messages = {
           ...this.messages,
-          [roomId]: { hasNext: true, messages: [message] }
+          [roomId]: { hasNext: false, messages: [message] }
         }
         return
       }

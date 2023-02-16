@@ -19,5 +19,5 @@ type UserRepository interface {
 	CheckUsedUserName(userName string) (*model.UserWithoutPass, error)
 	//search users
 	GetUserList(limit int, offset int, name string, gender string, prefect string, user_id string) (*model.UserList, error)
-	GetRoomUsers(roomId string, userId string) (*model.UserList, error)
+	GetRoomUsers(roomId string, userId string) (*[]string, error)
 }
