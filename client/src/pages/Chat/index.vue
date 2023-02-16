@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { AxiosError } from 'axios'
-import { onMounted, ref, computed, reactive } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 //import { useMe } from '@/store/me'
 import { useMessages } from '@/store/message'
@@ -20,7 +20,7 @@ const roomId = route.params.id as string
 
 const messages = computed(() => messageStore.getMessage(roomId).messages)
 const contentDivRef = ref<HTMLDivElement>()
-const roominfo = reactive({ name: '' })
+const roominfo = computed(() => storeRoom.getRoom(roomId))
 
 const onSubmit = async () => {
   const message = draftMessageStore.getMessage(roomId)
@@ -49,17 +49,17 @@ onMounted(async () => {
     }
   }
 
-  try {
-    storeRoom.setLoading(true)
-    await storeRoom.fetchRoomName(roomId)
-  } catch (e: any) {
-    const err: AxiosError = e
-    showErrorMessage(err)
-  } finally {
-    storeRoom.setLoading(false)
+  if (!roominfo.value) {
+    try {
+      storeRoom.setLoading(true)
+      await storeRoom.fetchRoomName(roomId)
+    } catch (e: any) {
+      const err: AxiosError = e
+      showErrorMessage(err)
+    } finally {
+      storeRoom.setLoading(false)
+    }
   }
-
-  roominfo.name = storeRoom.getRoom(roomId)
 
   if (contentDivRef.value) {
     // scroll to bottom
@@ -71,7 +71,7 @@ onMounted(async () => {
 <template>
   <div class="chat-container">
     <div class="header">
-      {{ roominfo.name }}
+      {{ roominfo }}
     </div>
     <div class="content" ref="contentDivRef">
       <message-list

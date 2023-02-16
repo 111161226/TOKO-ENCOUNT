@@ -19,7 +19,7 @@ export const useroomNames = defineStore('roomUsers', {
     },
     async fetchRoomName(roomId: string) {
       const { data } = await apis.getRoomName(roomId)
-      this.roomnames = { ...this.roomnames, [roomId]: data.name }
+      this.roomnames = { ...this.roomnames, [roomId]: data.roomName }
     }
   }
 })

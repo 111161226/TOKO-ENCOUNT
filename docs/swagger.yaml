@@ -501,11 +501,11 @@ components:
       properties:
         roomId:
           type: string
-        name:
+        roomName:
           type: string
       required:
         - roomId
-        - name
+        - roomName
 
     ChatList:
       type: object

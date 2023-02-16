@@ -50,5 +50,5 @@ type ChatUserList struct {
 //struct for room name
 type RoomInfo struct {
 	RoomId string `json:"roomId" db:"room_id"`
-	Name   string `json:"roomName" db:"room_name"`
+	RoomName   string `json:"roomName" db:"room_name"`
 }

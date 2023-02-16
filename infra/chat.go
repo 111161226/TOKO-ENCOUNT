@@ -127,9 +127,9 @@ func (ci *chatInfra) CreateChat(destinationId string, post_user_id string) (*mod
 	}
 
 	//add room name
-	var roomname = post_user_name + "," + name
+	var roomname = post_user_name + ", " + name
 	_, err = ci.db.Exec(
-		"INSERT INTO `room_names` (`room_id`, `room_name`) VALUES (?, N?)",
+		"INSERT INTO `room_names` (`room_id`, `room_name`) VALUES (?, ?)",
 		roomId,
 		roomname,
 	)
