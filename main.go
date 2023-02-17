@@ -51,12 +51,13 @@ func main() {
 		{
 			apiChat.GET("", h.GetChatList)
 			apiChat.POST("", h.CreateChat)
-			apiChat.GET("/name/:rid", h.GetroomName)
 
 			apiRoomId := apiChat.Group("/:rid", mid.EnsureExistChatAndHaveAccessRight(h))
 			{
 				apiRoomId.POST("", h.ChatPost)
 				apiRoomId.GET("", h.GetMessages)
+				apiRoomId.GET("/name", h.GetroomName)
+				apiRoomId.POST("/name", h.EditRoomName)
 			}
 		}
 	}

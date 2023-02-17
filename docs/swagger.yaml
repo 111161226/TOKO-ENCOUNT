@@ -295,7 +295,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Message"
   
-  /api/chat/name/{rid}:  
+  /api/chat/{rid}/name:  
     get:
       tags:
         - chat
@@ -344,7 +344,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/RoomInfo"
       
-  /api/chat/add/{rid}:  
+  /api/chat/{rid}/add:  
     post:
       tags:
         - chat

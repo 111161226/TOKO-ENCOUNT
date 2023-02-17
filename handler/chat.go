@@ -95,6 +95,21 @@ func (h *Handler) CreateChat(c echo.Context) error {
 	return c.JSON(http.StatusOK, roomData)
 }
 
+//rename chat name
+func (h *Handler) EditRoomName(c echo.Context) error {
+	newName := c.QueryParam("newName")
+	if newName == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "`did` is required")
+	}
+	rid := c.Param("rid")
+	room, err := h.ci.UpdateRoomName(rid, newName)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, room)
+}
+
 //add new chat
 func (h *Handler) AddChatUser(c echo.Context) error {
 	sess, err := h.PickSession(c)

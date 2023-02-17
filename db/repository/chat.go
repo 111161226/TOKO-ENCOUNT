@@ -14,4 +14,5 @@ type ChatRepository interface {
 	/** roomId に参加している userId 以外の全ユーザーの未読数をインクリメントする */
 	IncrementNotRead(roomId string, userId string) error
 	GetRoomName(roomId string) (*model.RoomInfo, error)
+	UpdateRoomName(roomId string, name string) (*model.RoomInfo, error)
 }

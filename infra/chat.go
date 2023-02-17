@@ -217,6 +217,20 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 	return res, nil
 }
 
+//update room name
+func (ci *chatInfra) UpdateRoomName(roomId string, name string) (*model.RoomInfo, error) {
+	//update room name
+	_, err := ci.db.Exec(
+		"UPDATE `room_names` SET `room_name` = ? WHERE `room_id` = ? ",
+		name,
+		roomId,
+	)
+	return &model.RoomInfo{
+		RoomId: roomId,
+		RoomName: name,
+	}, err
+}
+
 //get users who join the designated chat ny roomId
 func (ci *chatInfra) GetChatByRoomId(roomId string) (*model.ChatUserList, error) {
 	users := []*model.ChatUser{}
