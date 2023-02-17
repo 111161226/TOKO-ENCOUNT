@@ -1,16 +1,17 @@
 <script lang="ts" setup>
 import { AxiosError } from 'axios'
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 //import { useMe } from '@/store/me'
 import { useMessages } from '@/store/message'
 import { useDraftMessages } from '@/store/draftMessage'
 import { useroomNames } from '@/store/roomName'
+import { useChatRooms } from '@/store/chatRoom'
 import { showErrorMessage } from '@/util/showErrorMessage'
 import ChatInput from './components/ChatInput.vue'
 import MessageList from './components/MessageList.vue'
 
-//const storeMe = useMe()
+const chatRoomStore = useChatRooms()
 const draftMessageStore = useDraftMessages()
 const messageStore = useMessages()
 const storeRoom = useroomNames()
@@ -21,6 +22,12 @@ const roomId = route.params.id as string
 const messages = computed(() => messageStore.getMessage(roomId).messages)
 const contentDivRef = ref<HTMLDivElement>()
 const roominfo = computed(() => storeRoom.getRoom(roomId))
+const edit = reactive({
+  update: false
+})
+const inputData = reactive({
+  roomname: ''
+})
 
 const onSubmit = async () => {
   const message = draftMessageStore.getMessage(roomId)
@@ -32,6 +39,38 @@ const onSubmit = async () => {
       const err: AxiosError = e
       showErrorMessage(err)
     }
+  }
+}
+
+const updateName = async () => {
+  if (inputData.roomname) {
+    try {
+      storeRoom.setLoading(true)
+      await storeRoom.updateName(roomId, inputData.roomname)
+    } catch (e: any) {
+      const err: AxiosError = e
+      showErrorMessage(err)
+    } finally {
+      storeRoom.setLoading(false)
+      edit.update = false
+    }
+
+    try {
+      chatRoomStore.setLoading(true)
+      chatRoomStore.setName(roomId, inputData.roomname)
+    } catch (e: any) {
+      const err: AxiosError = e
+      showErrorMessage(err)
+    } finally {
+      chatRoomStore.setLoading(false)
+      inputData.roomname = ''
+    }
+  }
+}
+
+const editName = async () => {
+  if (roomId != '0') {
+    edit.update = true
   }
 }
 
@@ -70,8 +109,27 @@ onMounted(async () => {
 
 <template>
   <div class="chat-container">
-    <div class="header">
+    <div v-if="roomId === '0'" class="header">
       {{ roominfo }}
+    </div>
+    <div v-else-if="edit.update === false" class="header">
+      <div class="row">
+        {{ roominfo }}
+        <div @click="editName" @keydown.enter="editName">
+          <el-icon size="1.5rem" class="icon"><promotion /></el-icon>
+        </div>
+      </div>
+    </div>
+    <div v-else class="header">
+      <el-input
+        v-model="inputData.roomname"
+        maxlength="30"
+        show-word-limit
+        @keyup.enter="updateName"
+      />
+      <div @click="updateName" @keydown.enter="updateName">
+        <el-icon size="1.5rem" class="icon"><promotion /></el-icon>
+      </div>
     </div>
     <div class="content" ref="contentDivRef">
       <message-list
@@ -105,6 +163,11 @@ onMounted(async () => {
   overflow-y: auto;
   padding: 0.5rem 1rem;
   flex-grow: 1;
+}
+.row {
+  display: flex;
+  align-items: flex-end;
+  padding: 0.5rem 1rem;
 }
 
 .input-container {

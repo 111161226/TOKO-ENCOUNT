@@ -24,6 +24,18 @@ export const useChatRooms = defineStore('chatRooms', {
         hasNext: data.hasNext
       }
     },
+    setName(roomId: string, name: string) {
+      const idx = this.chatList.chats.findIndex(c => c.roomId === roomId)
+      if (idx === -1) {
+        // room が見つからない場合
+        return
+      }
+      const prevData = this.chatList.chats[idx]
+      this.chatList.chats[idx] = {
+        ...prevData,
+        name: name
+      }
+    },
     setLoading(loading: boolean) {
       this.loading = loading
     },
