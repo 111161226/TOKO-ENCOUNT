@@ -172,69 +172,29 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 		return res, nil
 	}
 
-	//select userId user name is needed
-	idRoomMap := map[string][]string{}
-	ids := []string{}
+	//get room names by roomId
+	RoomidNameMap := map[string]string{}
 	for _, m := range messages {
-		if m.RoomId == "0" { // case open chat
-			if m.UserId != userId { //posting user is needed when the latest message is not sent by me
-				ids = append(ids, m.UserId)
-			}
-			continue
+		if m.RoomId == "0" {
+			RoomidNameMap[m.RoomId] = "全体チャット"
 		}
-
-		if m.UserId == userId {
-			//when the latest message is not sent by me
-			var userids []string
-			err = ci.db.Select(
-				&userids,
-				"SELECT `user_id` FROM `room_datas` WHERE `room_id` = ? AND `user_id` != ?",
-				m.RoomId,
-				m.UserId,
-			)
-			for _, id := range userids {
-				idRoomMap[m.RoomId] = append(idRoomMap[m.RoomId], id)
-				ids = append(ids, id)
-			}
-		} else {
-			//when the latest message is sent by me
-			ids = append(ids, m.UserId)
+		var roomname string
+		err = ci.db.Get(
+			&roomname,
+			"SELECT `room_name` FROM `room_names` WHERE `room_id` = ?",
+			m.RoomId,
+		)
+		if err != nil {
+			return nil, err
 		}
-	}
-	ids = append(ids, userId) //want my username
-	query, args, err := sqlx.In("SELECT `user_id`, `user_name`, `prefect`, `gender` FROM `users` WHERE `user_id` IN (?)", ids)
-	if err != nil {
-		return nil, err
-	}
-	users := []model.UserWithoutPass{}
-	err = ci.db.Select(&users, query, args...)
-	if err != nil {
-		return nil, err
-	}
-
-	//this dic has key in userId and value of username
-	idNameMap := map[string]string{}
-	for _, u := range users {
-		idNameMap[u.UserId] = u.UserName
+		RoomidNameMap[m.RoomId] = roomname
 	}
 
 	chatLst := []*model.ChatData{}
 	for _, m := range messages {
-		m.UserName = idNameMap[m.UserId]
-		name := idNameMap[m.UserId]
-		if m.RoomId == "0" {
-			name = "全体チャット"
-		} else if m.UserId == userId {
-			//when the latest message is sent by me
-			tmp := ""
-			for _, id := range idRoomMap[m.RoomId] {
-				tmp += idNameMap[id] + ", "
-			}
-			name = tmp
-		}
 		c := &model.ChatData{
 			RoomId:          m.RoomId,
-			Name:            name,
+			Name:            RoomidNameMap[m.RoomId],
 			LatestMessage:   m.Message,
 			NewMessageCount: m.NotRead,
 		}
