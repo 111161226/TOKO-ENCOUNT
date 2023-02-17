@@ -316,6 +316,33 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RoomInfo"
+    post:
+      tags:
+        - chat
+      summary: ridのルーム名を変更
+      operationId: editRoomName
+      parameters:
+        - name: rid
+          in: path
+          required: true
+          description: ルームID(全体チャットは0)
+          schema:
+            type: string
+            format: uuid
+        - name: newName
+          in: query
+          required: true
+          description: 新規の名前
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 新規のルームメイトIDを取得
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomInfo"
       
   /api/chat/add/{rid}:  
     post:
