@@ -342,7 +342,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RoomInfo"
+                $ref: "#/components/schemas/ChatData"
       
   /api/chat/{rid}/add:  
     post:
