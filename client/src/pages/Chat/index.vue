@@ -121,14 +121,16 @@ onMounted(async () => {
       </div>
     </div>
     <div v-else class="header">
-      <el-input
-        v-model="inputData.roomname"
-        maxlength="30"
-        show-word-limit
-        @keyup.enter="updateName"
-      />
-      <div @click="updateName" @keydown.enter="updateName">
-        <el-icon size="1.5rem" class="icon"><promotion /></el-icon>
+      <div class="row">
+        <el-input
+          v-model="inputData.roomname"
+          maxlength="30"
+          show-word-limit
+          @keyup.enter="updateName"
+        />
+        <div @click="updateName" @keydown.enter="updateName">
+          <el-icon size="1.5rem" class="icon"><promotion /></el-icon>
+        </div>
       </div>
     </div>
     <div class="content" ref="contentDivRef">
