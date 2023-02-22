@@ -97,17 +97,40 @@ func (h *Handler) CreateChat(c echo.Context) error {
 
 //rename chat name
 func (h *Handler) EditRoomName(c echo.Context) error {
+	sess, err := h.PickSession(c)
+	if err != nil {
+		return err
+	}
 	newName := c.QueryParam("newName")
 	if newName == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, "`did` is required")
 	}
 	rid := c.Param("rid")
-	room, err := h.ci.UpdateRoomName(rid, newName)
+	chatinfo, err := h.ci.UpdateRoomName(rid, newName, sess.UserId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	//notify new message to talk opponent
+	if(rid == "0") {
+		err = h.ws.NotifyNewMessage([]string{"0"}, rid, &chatinfo.LatestMessage)
+	} else {
+		users, err := h.ui.GetRoomUsers(rid, sess.UserId)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}	
+		err = h.ws.NotifyNewMessage(*users, rid, &chatinfo.LatestMessage)
+	}
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	
+	//increment talk opponent not read number
+	err = h.ci.IncrementNotRead(rid, sess.UserId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, room)
+	return c.JSON(http.StatusOK, chatinfo)
 }
 
 //add new chat

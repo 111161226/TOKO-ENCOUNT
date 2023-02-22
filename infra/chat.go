@@ -218,16 +218,36 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 }
 
 //update room name
-func (ci *chatInfra) UpdateRoomName(roomId string, name string) (*model.RoomInfo, error) {
+func (ci *chatInfra) UpdateRoomName(roomId string, name string, userId string) (*model.ChatData, error) {
 	//update room name
 	_, err := ci.db.Exec(
 		"UPDATE `room_names` SET `room_name` = ? WHERE `room_id` = ? ",
 		name,
 		roomId,
 	)
-	return &model.RoomInfo{
+	post_user_name := ""
+	//create first message
+	err = ci.db.Get(
+		&post_user_name,
+		"SELECT user_name FROM users WHERE user_id = ?",
+		userId,
+	)
+	if err != nil {
+		return nil, err
+	}
+	mess := fmt.Sprintf("ユーザー%sが名前を%sに変更しました", post_user_name, name)
+	message := model.MessageSimple{
+		Post: mess,
+	}
+	postedMessage, err := ci.PostChat(roomId, &message, userId)
+	if err != nil {
+		return nil, err
+	}
+	return &model.ChatData{
 		RoomId: roomId,
-		RoomName: name,
+		Name: name,
+		LatestMessage: *postedMessage,
+		NewMessageCount: 0,
 	}, err
 }
 
