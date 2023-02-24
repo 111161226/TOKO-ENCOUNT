@@ -2,19 +2,19 @@
 import { AxiosError } from 'axios'
 import { onMounted, ref, computed, reactive } from 'vue'
 import { useRoute } from 'vue-router'
-//import { useMe } from '@/store/me'
 import { useMessages } from '@/store/message'
 import { useDraftMessages } from '@/store/draftMessage'
 import { useroomNames } from '@/store/roomName'
 import { useChatRooms } from '@/store/chatRoom'
+import apis from '@/lib/apis'
 import { showErrorMessage } from '@/util/showErrorMessage'
 import ChatInput from './components/ChatInput.vue'
 import MessageList from './components/MessageList.vue'
 
-const chatRoomStore = useChatRooms()
 const draftMessageStore = useDraftMessages()
 const messageStore = useMessages()
 const storeRoom = useroomNames()
+const chatRoomStore = useChatRooms()
 
 const route = useRoute()
 const roomId = route.params.id as string
@@ -45,26 +45,16 @@ const onSubmit = async () => {
 const updateName = async () => {
   if (inputData.roomname) {
     try {
-      storeRoom.setLoading(true)
-      await storeRoom.updateName(roomId, inputData.roomname)
-    } catch (e: any) {
-      const err: AxiosError = e
-      showErrorMessage(err)
-    } finally {
-      storeRoom.setLoading(false)
-      edit.update = false
-    }
-
-    try {
-      chatRoomStore.setLoading(true)
+      const { data } = await apis.editRoomName(roomId, inputData.roomname)
+      storeRoom.updateName(roomId, inputData.roomname)
       chatRoomStore.setName(roomId, inputData.roomname)
+      messageStore.addMessage(roomId, data.latestMessage)
     } catch (e: any) {
       const err: AxiosError = e
       showErrorMessage(err)
-    } finally {
-      chatRoomStore.setLoading(false)
-      inputData.roomname = ''
     }
+    inputData.roomname = ''
+    edit.update = false
   }
 }
 

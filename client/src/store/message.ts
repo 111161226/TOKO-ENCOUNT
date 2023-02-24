@@ -39,6 +39,9 @@ export const useMessages = defineStore('messages', {
       })
       this.messages[roomId].messages.unshift(data)
     },
+    addMessage(roomId: string, message: Message) {
+      this.messages[roomId].messages.unshift(message)
+    },
     setLoading(value: boolean) {
       this.loading = value
     },
