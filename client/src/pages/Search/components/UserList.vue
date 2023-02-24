@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import apis, { UserWithoutPass } from '@/lib/apis'
 import { useUsers } from '@/store/user'
-//import { useroomUsers } from '@/store/roomUser'
 import { showErrorMessage } from '@/util/showErrorMessage'
 import { AxiosError } from 'axios'
 import { ElLoading } from 'element-plus'
@@ -19,7 +18,6 @@ const props = defineProps<{
 
 const router = useRouter()
 const userStore = useUsers()
-//const storeRoomUser = useroomUsers()
 
 const hasNext = computed(() => userStore.getUsers.hasNext)
 const loading = computed(() => userStore.getLoading)

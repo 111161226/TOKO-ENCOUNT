@@ -177,6 +177,7 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 	for _, m := range messages {
 		if m.RoomId == "0" {
 			RoomidNameMap[m.RoomId] = "全体チャット"
+			continue
 		}
 		var roomname string
 		err = ci.db.Get(

@@ -22,8 +22,7 @@ export const useroomNames = defineStore('roomUsers', {
       this.roomnames = { ...this.roomnames, [roomId]: data.roomName }
     },
     async updateName(roomId: string, name: string) {
-      const { data } = await apis.editRoomName(roomId, name)
-      this.roomnames = { ...this.roomnames, [roomId]: data.roomName }
+      this.roomnames = { ...this.roomnames, [roomId]: name }
     }
   }
 })
