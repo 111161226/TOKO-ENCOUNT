@@ -34,6 +34,21 @@ export const useUsers = defineStore('users', {
         hasNext: data.hasNext
       }
     },
+    async fetchAddMembers(limit: number, name: string) {
+      const prevData = this.users
+      const { data } = await apis.getUsers(
+        limit,
+        prevData.users.length,
+        name,
+        '',
+        ''
+      )
+
+      this.users = {
+        users: [...prevData.users, ...data.users],
+        hasNext: data.hasNext
+      }
+    },
     setLoading(value: boolean) {
       this.loading = value
     }

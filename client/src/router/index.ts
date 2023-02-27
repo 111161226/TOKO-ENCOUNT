@@ -51,6 +51,12 @@ const privateRoutes: IRouteRecordRaw[] = [
     name: 'Chat',
     component: () => import('@/pages/Chat/index.vue'),
     meta: { title: 'Chat' }
+  },
+  {
+    path: '/chat/:id/add',
+    name: 'Search Member to add to private chat',
+    component: () => import('@/pages/Add/index.vue'),
+    meta: { title: 'Search Member to add to private chat' }
   }
 ]
 
