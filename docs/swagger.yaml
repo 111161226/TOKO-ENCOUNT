@@ -358,10 +358,10 @@ paths:
           schema:
             type: string
             format: uuid
-        - name: username
+        - name: userId
           in: query
           required: true
-          description: 追加相手のユーザーネーム
+          description: 追加相手のユーザーID
           schema:
             type: string
             format: uuid
