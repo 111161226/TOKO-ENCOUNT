@@ -344,7 +344,34 @@ paths:
               schema:
                 $ref: "#/components/schemas/ChatData"
       
-  /api/chat/{rid}/add:  
+  /api/chat/{rid}/add:
+    get:
+      tags:
+        - chat
+      summary: ridに追加するメンバーを取得
+      operationId: getAddmembers
+      parameters:
+        - name: rid
+          in: path
+          required: true
+          description: ルームID(全体チャットは0)
+          schema:
+            type: string
+            format: uuid
+        - name: username
+          in: query
+          required: true
+          description: 追加相手のユーザーネーム
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 取得しました
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserList"
     post:
       tags:
         - chat
