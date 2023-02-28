@@ -373,7 +373,7 @@ paths:
             default: 20
         - name: offset
           in: query
-          description: 何件目のメッセージから取得するか
+          description: 何件目のユーザーから取得するか
           schema:
             type: integer
             default: 0
@@ -397,7 +397,7 @@ paths:
           schema:
             type: string
             format: uuid
-        - name: userId
+        - name: did
           in: query
           required: true
           description: 追加相手のユーザーID
