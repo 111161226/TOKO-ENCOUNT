@@ -34,14 +34,13 @@ export const useUsers = defineStore('users', {
         hasNext: data.hasNext
       }
     },
-    async fetchAddMembers(limit: number, name: string) {
+    async fetchAddMembers(limit: number, name: string, rid: string) {
       const prevData = this.users
-      const { data } = await apis.getUsers(
-        limit,
-        prevData.users.length,
+      const { data } = await apis.getAddmembers(
+        rid,
         name,
-        '',
-        ''
+        limit,
+        prevData.users.length
       )
 
       this.users = {

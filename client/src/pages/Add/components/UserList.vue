@@ -37,7 +37,7 @@ const onAddRoom = async (userId: string) => {
 const fetchData = async () => {
   try {
     userStore.setLoading(true)
-    await userStore.fetchAddMembers(30, props.searchQuery.name)
+    await userStore.fetchAddMembers(30, props.searchQuery.name, roomId)
   } catch (e: any) {
     const err: AxiosError = e
     showErrorMessage(err)

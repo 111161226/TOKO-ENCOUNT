@@ -4,8 +4,11 @@ import UserList from './components/UserList.vue'
 import { AxiosError } from 'axios'
 import { showErrorMessage } from '@/util/showErrorMessage'
 import { useUsers } from '@/store/user'
+import { useRoute } from 'vue-router'
 
 const userStore = useUsers()
+const route = useRoute()
+const roomId = route.params.id as string
 
 const input = ref({
   name: ''
@@ -17,7 +20,7 @@ const onSearch = async () => {
   try {
     userStore.initializeUsers()
     userStore.setLoading(true)
-    await userStore.fetchAddMembers(30, input.value.name)
+    await userStore.fetchAddMembers(30, input.value.name, roomId)
   } catch (e: any) {
     const err: AxiosError = e
     showErrorMessage(err)
