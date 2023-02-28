@@ -307,3 +307,50 @@ func (ui *userInfra) GetRoomUsers(roomId string, userId string) (*[]string, erro
 	}
 	return &users, nil
 }
+
+//get user not included in the room
+func (ui *userInfra) GetUserListByUsername(limit int, offset int, name string, userId string, list []string) (*model.UserList, error) {
+	//create query
+	query := "SELECT `user_id`, `user_name`, `prefect`, `gender` FROM `users` WHERE `user_id` != ? AND `user_name` LIKE ? LIMIT ? OFFSET ? "
+	users_p := []*model.UserWithoutPass{}
+	err := ui.db.Select(
+		&users_p,
+		query,
+		userId,
+		limit,
+		offset,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	users := []*model.UserWithoutPass{}
+	for _, user_info := range users_p {
+		delete := 0
+		for _, userid := range list {
+			if user_info.UserId == userid {
+				delete = 1
+				break
+			}
+		}
+		if delete == 0 {
+			users = append(users, user_info)
+		}
+	}
+
+	//get the number of the designated user
+	query1 := "SELECT COUNT(*) FROM `users` WHERE `user_id` != ? AND `user_name` LIKE ? LIMIT ? OFFSET ? "
+	var count int
+	err = ui.db.Get(
+		&count,
+		query1,
+		userId,
+		limit,
+		offset,
+	)
+
+	return &model.UserList{
+		HasNext: count - len(list) > len(users)+offset,
+		Users:   &users,
+	}, nil
+}

@@ -20,4 +20,5 @@ type UserRepository interface {
 	//search users
 	GetUserList(limit int, offset int, name string, gender string, prefect string, user_id string) (*model.UserList, error)
 	GetRoomUsers(roomId string, userId string) (*[]string, error)
+	GetUserListByUsername(limit int, offset int, name string, userId string, list []string) (*model.UserList, error)
 }
