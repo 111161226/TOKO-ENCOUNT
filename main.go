@@ -58,7 +58,7 @@ func main() {
 				apiRoomId.GET("", h.GetMessages)
 				apiRoomId.GET("/name", h.GetroomName)
 				apiRoomId.POST("/name", h.EditRoomName)
-				apiRoomId.GET("/add", h.NotImpl)
+				apiRoomId.GET("/add", h.SearchUserbyUsername)
 				apiRoomId.POST("/add", h.AddChatUser)
 			}
 		}

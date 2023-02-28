@@ -222,3 +222,43 @@ func (h *Handler) SearchUser(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, userlist)
 }
+
+func (h *Handler) SearchUserbyUsername(c echo.Context) error {
+	sess, err := h.PickSession(c)
+	if err != nil {
+		return err
+	}
+	//get input
+	l := c.QueryParam("limit")
+	if l == "" {
+		l = "20"
+	}
+	limit, err := strconv.Atoi(l)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	o := c.QueryParam("offset")
+	if o == "" {
+		o = "0"
+	}
+	offset, err := strconv.Atoi(o)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	name := c.QueryParam("name")
+
+	//get users who match conditions
+	rid := c.Param("rid")
+	users, err := h.ui.GetRoomUsers(rid, sess.UserId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}	
+	userlist, err := h.ui.GetUserListByUsername(limit, offset, name, sess.UserId, *users)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, userlist)
+}
