@@ -140,30 +140,26 @@ func (h *Handler) AddChatUser(c echo.Context) error {
 		return err
 	}
 
-	addusername := c.QueryParam("username")
-	if addusername == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "`username` is required")
+	did := c.QueryParam("did")
+	if did == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "`did` is required")
 	}
-	//chaeck did user is valid in creating chat
-	u, err := h.ui.GetUserByUserName(addusername)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return echo.NewHTTPError(http.StatusBadRequest, "invalid `username`")
-		}
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-	}
-	if u.UserId == sess.UserId {
+	if did == sess.UserId {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid `did`")
 	}
 	rid := c.Param("rid")
 
-	roomData, err := h.ci.AddPrivateChat(rid, u.UserId)
+	roomData, err := h.ci.AddPrivateChat(rid, did)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	//notify new message to talk opponent
-	err = h.ws.NotifyNewMessage([]string{u.UserId}, roomData.RoomId, &roomData.LatestMessage)
+	users, err := h.ui.GetRoomUsers(rid, sess.UserId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}	
+	err = h.ws.NotifyNewMessage(*users, rid, &roomData.LatestMessage)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

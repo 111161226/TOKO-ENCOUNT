@@ -321,7 +321,7 @@ func (ci *chatInfra) AddPrivateChat(roomId string, did string) (*model.ChatData,
 	//update room name
 	_, err = ci.db.Exec(
 		"UPDATE `room_names` SET `room_name` = ? WHERE room_id = ?",
-		curname+" "+name,
+		curname+", "+name,
 		roomId,
 	)
 	if err != nil {
