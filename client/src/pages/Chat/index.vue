@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { AxiosError } from 'axios'
 import { onMounted, ref, computed, reactive } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useMessages } from '@/store/message'
 import { useDraftMessages } from '@/store/draftMessage'
 import { useroomNames } from '@/store/roomName'
@@ -18,6 +18,7 @@ const chatRoomStore = useChatRooms()
 
 const route = useRoute()
 const roomId = route.params.id as string
+const router = useRouter()
 
 const messages = computed(() => messageStore.getMessage(roomId).messages)
 const contentDivRef = ref<HTMLDivElement>()
@@ -61,6 +62,15 @@ const updateName = async () => {
 const editName = async () => {
   if (roomId != '0') {
     edit.update = true
+  }
+}
+
+const Adduser = async () => {
+  try {
+    router.push(`/chat/${roomId}/add`)
+  } catch (e: any) {
+    const err: AxiosError = e
+    showErrorMessage(err)
   }
 }
 
@@ -108,6 +118,9 @@ onMounted(async () => {
         <div @click="editName" @keydown.enter="editName">
           <el-icon size="1.5rem" class="icon"><promotion /></el-icon>
         </div>
+        <button class="invite-button" @click="Adduser">
+          <div>招待</div>
+        </button>
       </div>
     </div>
     <div v-else class="header">
@@ -169,6 +182,21 @@ onMounted(async () => {
 }
 .input {
   margin-right: 0.5rem;
+}
+.invite-button {
+  display: flex;
+  align-items: center;
+  background-color: $color-primary;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  &:hover {
+    background-color: $color-secondary;
+  }
+  margin-left: auto;
 }
 .icon {
   color: $color-secondary;
