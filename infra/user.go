@@ -317,6 +317,7 @@ func (ui *userInfra) GetUserListByUsername(limit int, offset int, name string, u
 		&users_p,
 		query,
 		userId,
+		name,
 		limit,
 		offset,
 	)
@@ -345,6 +346,7 @@ func (ui *userInfra) GetUserListByUsername(limit int, offset int, name string, u
 		&count,
 		query1,
 		userId,
+		name,
 		limit,
 		offset,
 	)
