@@ -247,7 +247,7 @@ func (h *Handler) SearchUserbyUsername(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	name := c.QueryParam("name")
+	name := c.QueryParam("username")
 
 	//get users who match conditions
 	rid := c.Param("rid")
