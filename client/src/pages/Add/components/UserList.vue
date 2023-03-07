@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import apis, { UserWithoutPass } from '@/lib/apis'
 import { useUsers } from '@/store/user'
+import { useMessages } from '@/store/message'
 import { showErrorMessage } from '@/util/showErrorMessage'
 import { AxiosError } from 'axios'
 import { ElLoading } from 'element-plus'
@@ -16,6 +17,7 @@ const props = defineProps<{
 
 const router = useRouter()
 const userStore = useUsers()
+const messageStore = useMessages()
 const route = useRoute()
 const roomId = route.params.id as string
 
@@ -27,6 +29,7 @@ const loadingEle = ref<HTMLDivElement>()
 const onAddRoom = async (userId: string) => {
   try {
     const { data } = await apis.addChat(roomId, userId)
+    messageStore.addMessage(roomId, data.latestMessage)
     router.push(`/chat/${data.roomId}`)
   } catch (e: any) {
     const err: AxiosError = e
