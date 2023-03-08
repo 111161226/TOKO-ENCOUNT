@@ -8,7 +8,7 @@ type ChatRepository interface {
 	CreateChat(destinationId string, post_user_id string) (*model.ChatData, error)
 	GetChatList(userId string, limit int, offset int) (*model.ChatList, error)
 	GetChatByRoomId(roomId string) (*model.ChatUserList, error)
-	AddPrivateChat(roomId string, did string) (*model.ChatData, error)
+	AddPrivateChat(roomId string, did string, post_user_id string) (*model.ChatData, error)
 	AddOpenChat(userId string) error
 	ResetNotRead(roomId string, userId string) error
 	/** roomId に参加している userId 以外の全ユーザーの未読数をインクリメントする */

@@ -269,7 +269,7 @@ func (ci *chatInfra) GetChatByRoomId(roomId string) (*model.ChatUserList, error)
 }
 
 //add new member to private chat
-func (ci *chatInfra) AddPrivateChat(roomId string, did string) (*model.ChatData, error) {
+func (ci *chatInfra) AddPrivateChat(roomId string, did string, post_user_id string) (*model.ChatData, error) {
 	_, err := ci.db.Exec(
 		"INSERT INTO `room_datas` (`room_id`, `user_id`) VALUES (?, ?)",
 		roomId,
@@ -293,7 +293,7 @@ func (ci *chatInfra) AddPrivateChat(roomId string, did string) (*model.ChatData,
 		Post: mess,
 	}
 	//post first message
-	m, err := ci.PostChat(roomId, &message, did)
+	m, err := ci.PostChat(roomId, &message, post_user_id)
 	if err != nil {
 		return nil, err
 	}

@@ -149,7 +149,7 @@ func (h *Handler) AddChatUser(c echo.Context) error {
 	}
 	rid := c.Param("rid")
 
-	roomData, err := h.ci.AddPrivateChat(rid, did)
+	roomData, err := h.ci.AddPrivateChat(rid, did, sess.UserId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
