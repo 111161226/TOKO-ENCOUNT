@@ -2,7 +2,7 @@ version: '3'
 services:
   tokoencount:
     build: ./
-    entrypoint: dockerize -timeout 60s -wait tcp://mysql:3306
+    entrypoint: dockerize -timeout 110s -wait tcp://mysql:3306
     command: ./TOKO-ENCOUNT
     ports:
       - 3050:80
