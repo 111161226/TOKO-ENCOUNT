@@ -1,6 +1,10 @@
 FROM node:16-alpine AS client-build
 RUN apk add --update --no-cache openjdk8-jre-base
 WORKDIR /github.com/111161226/TOKO-ENCOUNT/client
+
+ARG VITE_API_HOST
+ENV VITE_API_HOST=$VITE_API_HOST
+
 COPY ./client/package*.json ./
 COPY ./client/scripts ./scripts
 COPY ./docs ../docs
