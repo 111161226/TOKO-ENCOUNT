@@ -12,7 +12,13 @@ interface EventData {
   }
 }
 
-const ENTRY_POINT = 'ws://localhost:3050/api/ws'
+const isProduction = import.meta.env.PROD;
+const host = import.meta.env.VITE_API_HOST || 'localhost:3050';
+
+// 本番なら wss://、ローカルなら ws:// を自動選択
+const protocol = isProduction ? 'wss' : 'ws';
+
+const ENTRY_POINT = `${protocol}://${host}/api/ws`;
 
 export const useWebSocket = defineStore('websocket', {
   state: (): { socket: WebSocket | undefined } => ({
