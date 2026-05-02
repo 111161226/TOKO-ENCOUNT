@@ -2,19 +2,17 @@ package main
 
 import (
 	"strings"
-	"os"
 
 	"github.com/111161226/TOKO-ENCOUNT/handler"
 	mid "github.com/111161226/TOKO-ENCOUNT/middleware"
-	_ "github.com/jackc/pgx/v4/stdlib"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
-	dsn := os.Getenv("DATABASE_URL")
-	db := sqlx.MustConnect("pgx", dsn)
+	db := sqlx.MustConnect("mysql", "root:password@tcp(mysql:3306)/chatdb?parseTime=true")
 
 	h := handler.NewHandler(db)
 
