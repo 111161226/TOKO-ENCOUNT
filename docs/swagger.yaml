@@ -6,7 +6,7 @@ info:
   description:  TOKO-ENCOUNT API
 
 servers:
-  - url: http://localhost:3050
+  - url: https://toko-encount.onrender.com/
 
 paths:
   '/api/login':
