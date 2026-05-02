@@ -3,6 +3,7 @@ package main
 import (
 	"strings"
 	"os"
+	"log"
 
 	"github.com/111161226/TOKO-ENCOUNT/handler"
 	mid "github.com/111161226/TOKO-ENCOUNT/middleware"
@@ -13,8 +14,17 @@ import (
 )
 
 func main() {
+	// main.go の冒頭
 	dsn := os.Getenv("DATABASE_URL")
-	db := sqlx.MustConnect("pgx", dsn)
+	if dsn == "" {
+		log.Fatal("DATABASE_URL is not set")
+	}
+
+	// Aiven接続なら "pgx" または "postgres" ドライバが必要[cite: 1]
+	db, err := sqlx.Connect("pgx", dsn) 
+	if err != nil {
+		log.Fatalf("Failed to connect to DB: %v", err)
+	}
 
 	h := handler.NewHandler(db)
 
@@ -66,5 +76,9 @@ func main() {
 		}
 	}
 
-	e.Logger.Fatal(e.Start(":80"))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" // ローカル用のデフォルト
+	}
+	e.Logger.Fatal(e.Start(":" + port))
 }
