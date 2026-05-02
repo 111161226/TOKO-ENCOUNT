@@ -2,6 +2,7 @@ package main
 
 import (
 	"strings"
+	"os"
 
 	"github.com/111161226/TOKO-ENCOUNT/handler"
 	mid "github.com/111161226/TOKO-ENCOUNT/middleware"
@@ -12,7 +13,8 @@ import (
 )
 
 func main() {
-	db := sqlx.MustConnect("mysql", "root:password@tcp(mysql:3306)/chatdb?parseTime=true")
+	dsn := os.Getenv("DATABASE_URL")
+	db := sqlx.MustConnect("pgx", dsn)
 
 	h := handler.NewHandler(db)
 

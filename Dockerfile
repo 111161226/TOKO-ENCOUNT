@@ -9,7 +9,7 @@ COPY ./client .
 RUN npm run gen-api
 RUN npm run build
 
-FROM golang:1.17-alpine AS server-build
+FROM golang:1.18-alpine AS server-build
 RUN apk add --update --no-cache git
 WORKDIR /go/src/github.com/111161226/TOKO-ENCOUNT
 COPY ./go.* ./
