@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/111161226/TOKO-ENCOUNT/db/model"
 	"github.com/111161226/TOKO-ENCOUNT/db/repository"
@@ -21,7 +22,7 @@ func NewUserInfra(db *sqlx.DB) repository.UserRepository {
 	return &userInfra{db: db}
 }
 
-//func for hashing password
+// func for hashing password
 func hash(pw string) string {
 	const salt = "SakataKintoki#"
 	h := sha256.New()
@@ -30,77 +31,62 @@ func hash(pw string) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-//delete user by logic
+// delete user by logic
 func (ui *userInfra) DeleteUser(userId string) error {
-	//get username by userId
 	var username string
 	err := ui.db.Get(
-		&username, "SELECT `user_name` FROM `users` WHERE `user_id` = ?",
+		&username, "SELECT user_name FROM users WHERE user_id = $1",
 		userId,
 	)
 	if err != nil {
 		return err
 	}
-	//delete user by username
 	_, err = ui.db.Exec(
-		"UPDATE `user_deletes` SET `flag` = ? WHERE `user_name` = ?",
+		"UPDATE user_deletes SET flag = $1 WHERE user_name = $2",
 		1,
 		username,
 	)
-	if err != nil {
-		return err
-	} 
 	return err
 }
 
-//check user data was used
+// check user data was used
 func (ui *userInfra) CheckUsedUser(userName string, password string) (*model.UserWithoutPass, error) {
-	//get user data
 	var user model.UserWithoutPass
 	err := ui.db.Get(
-		&user, "SELECT `users`.`user_id`, `users`.`user_name`, `users`.`prefect`, `users`.`gender` FROM `users` INNER JOIN `user_deletes` ON `users`.`user_name` = `user_deletes`.`user_name` WHERE `users`.`user_name` = ? AND `users`.`password` = ? AND `user_deletes`.`flag` = ?",
+		&user, "SELECT users.user_id, users.user_name, users.prefect, users.gender FROM users INNER JOIN user_deletes ON users.user_name = user_deletes.user_name WHERE users.user_name = $1 AND users.password = $2 AND user_deletes.flag = $3",
 		userName,
 		hash(password),
 		1,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			//in case no one uses the username, that is not error 
 			return nil, nil
 		}
 		return nil, err
 	}
-
 	return &user, nil
 }
 
-//restore user
+// restore user
 func (ui *userInfra) RestoreUser(userName string) error {
-	//update DB
 	_, err := ui.db.Exec(
-		"UPDATE `user_deletes` SET `flag` = ? WHERE `user_name` = ?",
+		"UPDATE user_deletes SET flag = $1 WHERE user_name = $2",
 		0,
 		userName,
 	)
-	if err != nil {
-		return  err
-	}
-	return nil
+	return err
 }
 
-//create user
+// create user
 func (ui *userInfra) CreateUser(user *model.User) (*model.UserWithoutPass, error) {
-	//set uuid
 	uu, err := uuid.NewRandom()
 	if err != nil {
 		return nil, err
 	}
-
 	userId := uu.String()
 
-	//insert data into DB
 	_, err = ui.db.Exec(
-		"INSERT INTO `users`(`user_id`, `user_name`, `password`, `prefect`, `gender`) VALUES (?, ?, ?, ? ,?)",
+		"INSERT INTO users(user_id, user_name, password, prefect, gender) VALUES ($1, $2, $3, $4, $5)",
 		userId,
 		user.UserName,
 		hash(user.Password),
@@ -111,7 +97,7 @@ func (ui *userInfra) CreateUser(user *model.User) (*model.UserWithoutPass, error
 		return nil, err
 	}
 	_, err = ui.db.Exec(
-		"INSERT INTO `user_deletes` (`user_name`) VALUES (?)",
+		"INSERT INTO user_deletes (user_name) VALUES ($1)",
 		user.UserName,
 	)
 	if err != nil {
@@ -127,24 +113,21 @@ func (ui *userInfra) CreateUser(user *model.User) (*model.UserWithoutPass, error
 }
 
 func (ui *userInfra) GetUserByUserId(userId string) (*model.UserWithoutPass, error) {
-	//get user data
 	var user model.UserWithoutPass
 	err := ui.db.Get(
-		&user, "SELECT `user_id`, `user_name`, `prefect`, `gender` FROM `users` WHERE `user_id` = ?",
+		&user, "SELECT user_id, user_name, prefect, gender FROM users WHERE user_id = $1",
 		userId,
 	)
 	if err != nil {
 		return nil, err
 	}
-
 	return &user, nil
 }
 
 func (ui *userInfra) GetUserByUserName(userName string) (*model.UserWithoutPass, error) {
-	//get user data
 	var user model.UserWithoutPass
 	err := ui.db.Get(
-		&user, "SELECT `user_id`, `user_name`, `prefect`, `gender` FROM `users` WHERE `user_name` = ?",
+		&user, "SELECT user_id, user_name, prefect, gender FROM users WHERE user_name = $1",
 		userName,
 	)
 	if err != nil {
@@ -155,24 +138,21 @@ func (ui *userInfra) GetUserByUserName(userName string) (*model.UserWithoutPass,
 }
 
 func (ui *userInfra) EditUser(userId string, user *model.UserUpdate) (*model.UserWithoutPass, error) {
-	//get old password
 	var oldpassword string
 	err := ui.db.Get(
-		&oldpassword, "SELECT `password` FROM `users` WHERE `user_id` = ?",
+		&oldpassword, "SELECT password FROM users WHERE user_id = $1",
 		userId,
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	//check password is right
 	if oldpassword != hash(user.Password) {
-		return nil, nil //in case password is incorrect , return nil
+		return nil, nil
 	}
 
-	//update DB
 	_, err = ui.db.Exec(
-		"UPDATE `users` SET `user_name` = ?, `password` = ?, `prefect` = ?, `gender` = ? WHERE `user_id` = ?",
+		"UPDATE users SET user_name = $1, password = $2, prefect = $3, gender = $4 WHERE user_id = $5",
 		user.UserName,
 		hash(user.NewPassword),
 		user.NewPrefect,
@@ -192,100 +172,88 @@ func (ui *userInfra) EditUser(userId string, user *model.UserUpdate) (*model.Use
 }
 
 func (ui *userInfra) CheckRightUser(user *model.UserSimple) (*model.UserWithoutPass, error) {
-	//get password
 	var password string
 	err := ui.db.Get(
-		&password, "SELECT `password` FROM `users` WHERE `user_name` = ?",
+		&password, "SELECT password FROM users WHERE user_name = $1",
 		user.UserName,
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	//check password is right
 	if password != hash(user.Password) {
 		return nil, fmt.Errorf("err : %s", "Incorrect password")
 	}
 
-	//get user data
 	var userwithoutpass model.UserWithoutPass
 	err = ui.db.Get(
-		&userwithoutpass, "SELECT `user_id`, `user_name`, `prefect`, `gender` FROM `users` WHERE `user_name` = ?",
+		&userwithoutpass, "SELECT user_id, user_name, prefect, gender FROM users WHERE user_name = $1",
 		user.UserName,
 	)
 	if err != nil {
 		return nil, err
 	}
-
 	return &userwithoutpass, nil
 }
 
 func (ui *userInfra) CheckUsedUserName(userName string) (*model.UserWithoutPass, error) {
-	//get userName
 	var user model.UserWithoutPass
 	err := ui.db.Get(
-		&user, "SELECT `user_id`, `user_name`, `prefect`, `gender` FROM `users` WHERE `user_name` = ?",
+		&user, "SELECT user_id, user_name, prefect, gender FROM users WHERE user_name = $1",
 		userName,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			//in case no one uses the username, that is not error 
 			return nil, nil
 		}
-
 		return nil, err
 	}
-
-	//in case the username is duplicated, user is not nil
 	return &user, nil
 }
 
-//get user by the term
+// get user by the term
 func (ui *userInfra) GetUserList(limit int, offset int, name string, gender string, prefect string, user_id string) (*model.UserList, error) {
-	//create query
-	query := ""
-	query1 := "SELECT `user_id`, `user_name`, `prefect`, `gender` FROM `users` WHERE `user_id` != ? "
-	query2 := "SELECT COUNT(*) FROM `users` WHERE `user_id` != ? "
-	bind := []interface{}{
-		user_id,
-	}
-	//check condition is added 
+	bind := []interface{}{user_id}
+	pCount := 1 // プレースホルダのカウンター
+
+	queryCond := ""
 	if name != "" {
-		query += "AND `user_name` LIKE ? "
+		pCount++
+		queryCond += "AND user_name LIKE $" + strconv.Itoa(pCount) + " "
 		bind = append(bind, "%"+name+"%")
 	}
-
 	if gender != "" {
-		query += "AND `gender` = ? "
+		pCount++
+		queryCond += "AND gender = $" + strconv.Itoa(pCount) + " "
 		bind = append(bind, gender)
 	}
-
 	if prefect != "" {
-		query += "AND `prefect` = ? "
+		pCount++
+		queryCond += "AND prefect = $" + strconv.Itoa(pCount) + " "
 		bind = append(bind, prefect)
 	}
 
-	//get designated user 
-	query1 = query1 + query + "LIMIT ? OFFSET ? "
-	bind1 := append(bind, limit, offset)
+	// データの取得
+	pCount++
+	limitIdx := pCount
+	pCount++
+	offsetIdx := pCount
+	queryData := "SELECT user_id, user_name, prefect, gender FROM users WHERE user_id != $1 " + queryCond + "LIMIT $" + strconv.Itoa(limitIdx) + " OFFSET $" + strconv.Itoa(offsetIdx)
+	bindData := append(bind, limit, offset)
+
 	users := []*model.UserWithoutPass{}
-	err := ui.db.Select(
-		&users,
-		query1,
-		bind1...,
-	)
+	err := ui.db.Select(&users, queryData, bindData...)
 	if err != nil {
 		return nil, err
 	}
 
-	//get the number of the designated user
-	query2 = query2 + query
+	// カウントの取得
+	queryTotal := "SELECT COUNT(*) FROM users WHERE user_id != $1 " + queryCond
 	var count int
-	err = ui.db.Get(
-		&count,
-		query2,
-		bind...,
-	)
+	err = ui.db.Get(&count, queryTotal, bind...)
+	if err != nil {
+		return nil, err
+	}
 
 	return &model.UserList{
 		HasNext: count > len(users)+offset,
@@ -293,12 +261,12 @@ func (ui *userInfra) GetUserList(limit int, offset int, name string, gender stri
 	}, nil
 }
 
-//get users by roomid
+// get users by roomid
 func (ui *userInfra) GetRoomUsers(roomId string, userId string) (*[]string, error) {
 	users := []string{}
 	err := ui.db.Select(
 		&users,
-		"SELECT `users`.`user_id` FROM `users` INNER JOIN `room_datas` ON `room_datas`.`user_id` = `users`.`user_id` WHERE `room_datas`.`room_id` = ? AND `users`.`user_id` != ?",
+		"SELECT users.user_id FROM users INNER JOIN room_datas ON room_datas.user_id = users.user_id WHERE room_datas.room_id = $1 AND users.user_id != $2",
 		roomId,
 		userId,
 	)
@@ -308,10 +276,9 @@ func (ui *userInfra) GetRoomUsers(roomId string, userId string) (*[]string, erro
 	return &users, nil
 }
 
-//get user not included in the room
+// get user not included in the room
 func (ui *userInfra) GetUserListByUsername(limit int, offset int, name string, userId string, list []string) (*model.UserList, error) {
-	//create query
-	query := "SELECT `user_id`, `user_name`, `prefect`, `gender` FROM `users` WHERE `user_id` != ? AND `user_name` LIKE ? LIMIT ? OFFSET ? "
+	query := "SELECT user_id, user_name, prefect, gender FROM users WHERE user_id != $1 AND user_name LIKE $2 LIMIT $3 OFFSET $4"
 	users_p := []*model.UserWithoutPass{}
 	err := ui.db.Select(
 		&users_p,
@@ -327,32 +294,32 @@ func (ui *userInfra) GetUserListByUsername(limit int, offset int, name string, u
 
 	users := []*model.UserWithoutPass{}
 	for _, user_info := range users_p {
-		delete := 0
+		isIncluded := false
 		for _, userid := range list {
 			if user_info.UserId == userid {
-				delete = 1
+				isIncluded = true
 				break
 			}
 		}
-		if delete == 0 {
+		if !isIncluded {
 			users = append(users, user_info)
 		}
 	}
 
-	//get the number of the designated user
-	query1 := "SELECT COUNT(*) FROM `users` WHERE `user_id` != ? AND `user_name` LIKE ? LIMIT ? OFFSET ? "
+	queryCount := "SELECT COUNT(*) FROM users WHERE user_id != $1 AND user_name LIKE $2"
 	var count int
 	err = ui.db.Get(
 		&count,
-		query1,
+		queryCount,
 		userId,
 		"%"+name+"%",
-		limit,
-		offset,
 	)
+	if err != nil {
+		return nil, err
+	}
 
 	return &model.UserList{
-		HasNext: count - len(list) > len(users)+offset,
+		HasNext: count-len(list) > len(users)+offset,
 		Users:   &users,
 	}, nil
 }
