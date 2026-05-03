@@ -7,7 +7,7 @@ import (
 
 	"github.com/111161226/TOKO-ENCOUNT/handler"
 	mid "github.com/111161226/TOKO-ENCOUNT/middleware"
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -20,7 +20,6 @@ func main() {
 		log.Fatal("DATABASE_URL is not set")
 	}
 
-	// Aiven接続なら "pgx" または "postgres" ドライバが必要[cite: 1]
 	db, err := sqlx.Connect("pgx", dsn) 
 	if err != nil {
 		log.Fatalf("Failed to connect to DB: %v", err)
