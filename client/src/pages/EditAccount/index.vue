@@ -25,9 +25,9 @@ watchEffect(() => {
     return
   }
 
-  value.validate(isValid =>
-    isValid ? (isFormValid.value = true) : (isFormValid.value = false)
-  )
+  value.validate((isValid) => {
+    isFormValid.value = !!isValid;
+  })
 })
 
 const inputData = reactive<UserUpdate>({

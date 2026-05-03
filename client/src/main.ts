@@ -4,6 +4,7 @@ import App from './App.vue'
 
 import ElementPlus from 'element-plus'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+// @ts-ignore
 import ja from 'element-plus/dist/locale/ja.mjs'
 import 'element-plus/dist/index.css'
 import { createPinia } from 'pinia'
