@@ -12,13 +12,9 @@ interface EventData {
   }
 }
 
-const isProduction = import.meta.env.PROD;
 const host = "toko-encount.onrender.com/";
 
-// 本番なら wss://、ローカルなら ws:// を自動選択
-const protocol = isProduction ? 'wss' : 'ws';
-
-const ENTRY_POINT = `${protocol}://${host}/api/ws`;
+const ENTRY_POINT = `https://${host}/api/ws`;
 
 export const useWebSocket = defineStore('websocket', {
   state: (): { socket: WebSocket | undefined } => ({
