@@ -39,7 +39,7 @@ export const useMe = defineStore('me', {
       this.me = data
     },
     async restoreMe() {
-      await api.restoreUser({ userName: this.me?.userName })
+      await api.restoreUser({ username: this.me?.userName })
     }
   }
 })

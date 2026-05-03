@@ -1,5 +1,5 @@
-FROM node:16-alpine AS client-build
-RUN apk add --update --no-cache openjdk8-jre-base
+FROM node:20-alpine AS client-build
+RUN apk add --update --no-cache openjdk17-jre
 WORKDIR /github.com/111161226/TOKO-ENCOUNT/client
 
 ARG VITE_API_HOST
@@ -13,7 +13,7 @@ COPY ./client .
 RUN npm run gen-api
 RUN npm run build
 
-FROM golang:1.18-alpine AS server-build
+FROM golang:1.22-alpine AS server-build
 RUN apk add --update --no-cache git
 WORKDIR /go/src/github.com/111161226/TOKO-ENCOUNT
 COPY ./go.* ./
@@ -26,7 +26,7 @@ RUN go mod download
 COPY . .
 RUN go build
 
-FROM alpine:3.15.0
+FROM alpine:3.19
 WORKDIR /app
 RUN apk --update --no-cache add tzdata ca-certificates openssl && \
   cp /usr/share/zoneinfo/Asia/Tokyo /etc/localtime && \
