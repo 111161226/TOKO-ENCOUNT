@@ -17,16 +17,16 @@ func NewChatInfra(db *sqlx.DB) repository.ChatRepository {
 	return &chatInfra{db: db}
 }
 
-//post message to chat
+// post message to chat
 func (ci *chatInfra) PostChat(roomId string, message *model.MessageSimple, post_user_id string) (*model.Message, error) {
 	ch, err := uuid.NewRandom()
 	if err != nil {
 		return nil, err
 	}
 	chatId := ch.String()
-	//insert message into chats db
+	// insert message into chats db
 	_, err = ci.db.Exec(
-		"INSERT INTO `chats` (`chat_id`, `room_id`, `post`, `post_user_id`) VALUES (?, ?, ?, ?)",
+		"INSERT INTO chats (chat_id, room_id, post, post_user_id) VALUES ($1, $2, $3, $4)",
 		chatId,
 		roomId,
 		message.Post,
@@ -35,25 +35,23 @@ func (ci *chatInfra) PostChat(roomId string, message *model.MessageSimple, post_
 	if err != nil {
 		return nil, err
 	}
-	//get posting message
+	// get posting message
 	mess := model.Message{}
 	err = ci.db.Get(
 		&mess,
-		"SELECT `post`, `chat_id`, `post_user_id`, `user_name`, `created_at` FROM `chats` INNER JOIN `users` ON `post_user_id` = `user_id` AND `chat_id` = ?",
+		"SELECT post, chat_id, post_user_id, user_name, created_at FROM chats INNER JOIN users ON post_user_id = user_id AND chat_id = $1",
 		chatId,
 	)
 
-	//return posting message
 	return &mess, nil
 }
 
-//get chat message by chat id
+// get chat message by chat id
 func (ci *chatInfra) GetMessages(roomId string, limit int, offset int) (*model.MessageList, error) {
-	//get message info
 	mess := []*model.Message{}
 	err := ci.db.Select(
 		&mess,
-		"SELECT post, chat_id, post_user_id, user_name, created_at FROM chats INNER JOIN users ON post_user_id = user_id WHERE room_id = ? ORDER BY `created_at` DESC LIMIT ? OFFSET ?",
+		"SELECT post, chat_id, post_user_id, user_name, created_at FROM chats INNER JOIN users ON post_user_id = user_id WHERE room_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3",
 		roomId,
 		limit,
 		offset,
@@ -61,11 +59,10 @@ func (ci *chatInfra) GetMessages(roomId string, limit int, offset int) (*model.M
 	if err != nil {
 		return nil, err
 	}
-	//get total of message
 	count := 0
 	err = ci.db.Get(
 		&count,
-		"SELECT COUNT(*) FROM `chats` WHERE `room_id` = ?",
+		"SELECT COUNT(*) FROM chats WHERE room_id = $1",
 		roomId,
 	)
 	if err != nil {
@@ -79,10 +76,9 @@ func (ci *chatInfra) GetMessages(roomId string, limit int, offset int) (*model.M
 
 func (ci *chatInfra) CreateChat(destinationId string, post_user_id string) (*model.ChatData, error) {
 	post_user_name := ""
-	//create first message
 	err := ci.db.Get(
 		&post_user_name,
-		"SELECT user_name FROM users WHERE user_id = ?",
+		"SELECT user_name FROM users WHERE user_id = $1",
 		post_user_id,
 	)
 	if err != nil {
@@ -97,9 +93,9 @@ func (ci *chatInfra) CreateChat(destinationId string, post_user_id string) (*mod
 		return nil, err
 	}
 	roomId := ch.String()
-	//add room_data to db
+	// add room_data to db
 	_, err = ci.db.Exec(
-		"INSERT INTO `room_datas` (`room_id`, `user_id`) VALUES (?, ?), (?, ?)",
+		"INSERT INTO room_datas (room_id, user_id) VALUES ($1, $2), ($3, $4)",
 		roomId,
 		post_user_id,
 		roomId,
@@ -109,27 +105,24 @@ func (ci *chatInfra) CreateChat(destinationId string, post_user_id string) (*mod
 		return nil, err
 	}
 
-	//post first message
 	m, err := ci.PostChat(roomId, &message, post_user_id)
 	if err != nil {
 		return nil, err
 	}
 
-	//return room info
 	var name string
 	err = ci.db.Get(
 		&name,
-		"SELECT `user_name` FROM `users` WHERE `user_id` = ?",
+		"SELECT user_name FROM users WHERE user_id = $1",
 		destinationId,
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	//add room name
 	var roomname = post_user_name + ", " + name
 	_, err = ci.db.Exec(
-		"INSERT INTO `room_names` (`room_id`, `room_name`) VALUES (?, ?)",
+		"INSERT INTO room_names (room_id, room_name) VALUES ($1, $2)",
 		roomId,
 		roomname,
 	)
@@ -155,7 +148,7 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 	//get my joined rooms and those latest message
 	err := ci.db.Select(
 		&messages,
-		"SELECT `chat`.`post`, `chat`.`chat_id`, `chat`.`post_user_id`, `chat`.`created_at`, `room`.`room_id`, `room`.`not_read` FROM (SELECT * FROM (SELECT `chat_id`, `room_id`, `post`, `post_user_id`, `created_at`, ROW_NUMBER() OVER(PARTITION BY `room_id` ORDER BY `created_at` DESC) AS `row_num` FROM `chats`) AS `c` WHERE `row_num` = 1) AS `chat` INNER JOIN (SELECT * FROM `room_datas` WHERE `user_id` = ?) AS `room` ON `room`.`room_id` = `chat`.`room_id` ORDER BY `chat`.`created_at` DESC LIMIT ? OFFSET ?",
+		"SELECT chat.post, chat.chat_id, chat.post_user_id, chat.created_at, room.room_id, room.not_read FROM (SELECT * FROM (SELECT chat_id, room_id, post, post_user_id, created_at, ROW_NUMBER() OVER(PARTITION BY room_id ORDER BY created_at DESC) AS row_num FROM chats) AS c WHERE row_num = 1) AS chat INNER JOIN (SELECT * FROM room_datas WHERE user_id = $1) AS room ON room.room_id = chat.room_id ORDER BY chat.created_at DESC LIMIT $2 OFFSET $3",
 		userId,
 		limit,
 		offset,
@@ -165,11 +158,10 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 	}
 
 	if len(messages) == 0 {
-		res := &model.ChatList{
+		return &model.ChatList{
 			HasNext: false,
 			Chats:   &[]*model.ChatData{},
-		}
-		return res, nil
+		}, nil
 	}
 
 	//get room names by roomId
@@ -182,7 +174,7 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 		var roomname string
 		err = ci.db.Get(
 			&roomname,
-			"SELECT `room_name` FROM `room_names` WHERE `room_id` = ?",
+			"SELECT room_name FROM room_names WHERE room_id = $1",
 			m.RoomId,
 		)
 		if err != nil {
@@ -202,35 +194,33 @@ func (ci *chatInfra) GetChatList(userId string, limit int, offset int) (*model.C
 		chatLst = append(chatLst, c)
 	}
 
-	//get total of joined room number
 	count := 0
+	// PostgreSQL は GROUP BY で指定したカラム以外を SELECT する際に制約があるが、COUNT(*) のみなら問題なし
 	err = ci.db.Get(
 		&count,
-		"SELECT COUNT(*) FROM `room_datas` WHERE `user_id` = ? GROUP BY `user_id`",
+		"SELECT COUNT(*) FROM room_datas WHERE user_id = $1",
 		userId,
 	)
 
-	res := &model.ChatList{
+	return &model.ChatList{
 		HasNext: count > len(chatLst)+offset,
 		Chats:   &chatLst,
-	}
-
-	return res, nil
+	}, nil
 }
 
-//update room name
 func (ci *chatInfra) UpdateRoomName(roomId string, name string, userId string) (*model.ChatData, error) {
-	//update room name
 	_, err := ci.db.Exec(
-		"UPDATE `room_names` SET `room_name` = ? WHERE `room_id` = ? ",
+		"UPDATE room_names SET room_name = $1 WHERE room_id = $2 ",
 		name,
 		roomId,
 	)
+	if err != nil {
+		return nil, err
+	}
 	post_user_name := ""
-	//create first message
 	err = ci.db.Get(
 		&post_user_name,
-		"SELECT user_name FROM users WHERE user_id = ?",
+		"SELECT user_name FROM users WHERE user_id = $1",
 		userId,
 	)
 	if err != nil {
@@ -245,11 +235,11 @@ func (ci *chatInfra) UpdateRoomName(roomId string, name string, userId string) (
 		return nil, err
 	}
 	return &model.ChatData{
-		RoomId: roomId,
-		Name: name,
-		LatestMessage: *postedMessage,
+		RoomId:          roomId,
+		Name:            name,
+		LatestMessage:   *postedMessage,
 		NewMessageCount: 0,
-	}, err
+	}, nil
 }
 
 //get users who join the designated chat ny roomId
@@ -257,7 +247,7 @@ func (ci *chatInfra) GetChatByRoomId(roomId string) (*model.ChatUserList, error)
 	users := []*model.ChatUser{}
 	err := ci.db.Select(
 		&users,
-		"SELECT room_id, user_id FROM room_datas WHERE room_id = ?",
+		"SELECT room_id, user_id FROM room_datas WHERE room_id = $1",
 		roomId,
 	)
 	if err != nil {
@@ -271,7 +261,7 @@ func (ci *chatInfra) GetChatByRoomId(roomId string) (*model.ChatUserList, error)
 //add new member to private chat
 func (ci *chatInfra) AddPrivateChat(roomId string, did string, post_user_id string) (*model.ChatData, error) {
 	_, err := ci.db.Exec(
-		"INSERT INTO `room_datas` (`room_id`, `user_id`) VALUES (?, ?)",
+		"INSERT INTO room_datas (room_id, user_id) VALUES ($1, $2)",
 		roomId,
 		did,
 	)
@@ -279,10 +269,9 @@ func (ci *chatInfra) AddPrivateChat(roomId string, did string, post_user_id stri
 		return nil, err
 	}
 	add_user_name := ""
-	//create first message
 	err = ci.db.Get(
 		&add_user_name,
-		"SELECT user_name FROM users WHERE user_id = ?",
+		"SELECT user_name FROM users WHERE user_id = $1",
 		did,
 	)
 	if err != nil {
@@ -292,35 +281,31 @@ func (ci *chatInfra) AddPrivateChat(roomId string, did string, post_user_id stri
 	message := model.MessageSimple{
 		Post: mess,
 	}
-	//post first message
 	m, err := ci.PostChat(roomId, &message, post_user_id)
 	if err != nil {
 		return nil, err
 	}
 
-	//return room info
 	var name string
 	err = ci.db.Get(
 		&name,
-		"SELECT `user_name` FROM `users` WHERE `user_id` = ?",
+		"SELECT user_name FROM users WHERE user_id = $1",
 		did,
 	)
 	if err != nil {
 		return nil, err
 	}
-	//get current username
 	var curname string
 	err = ci.db.Get(
 		&curname,
-		"SELECT `room_name` FROM `room_names` WHERE `room_id` = ?",
+		"SELECT room_name FROM room_names WHERE room_id = $1",
 		roomId,
 	)
 	if err != nil {
 		return nil, err
 	}
-	//update room name
 	_, err = ci.db.Exec(
-		"UPDATE `room_names` SET `room_name` = ? WHERE room_id = ?",
+		"UPDATE room_names SET room_name = $1 WHERE room_id = $2",
 		curname+", "+name,
 		roomId,
 	)
@@ -336,41 +321,36 @@ func (ci *chatInfra) AddPrivateChat(roomId string, did string, post_user_id stri
 	}, nil
 }
 
-//get room name
 func (ci *chatInfra) GetRoomName(roomId string) (*model.RoomInfo, error) {
-	//get room info
 	room := model.RoomInfo{}
 	err := ci.db.Get(
 		&room,
-		"SELECT `room_id`, `room_name` FROM `room_names` WHERE `room_id` = ? ",
+		"SELECT room_id, room_name FROM room_names WHERE room_id = $1 ",
 		roomId,
 	)
 	return &room, err
 }
 
-//add new user to open chat
 func (ci *chatInfra) AddOpenChat(userId string) error {
 	_, err := ci.db.Exec(
-		"INSERT INTO `room_datas` (`room_id`, `user_id`) VALUES (0, ?)",
+		"INSERT INTO room_datas (room_id, user_id) VALUES ('0', $1)",
 		userId,
 	)
 	return err
 }
 
-//not read message reset
 func (ci *chatInfra) ResetNotRead(roomId string, userId string) error {
 	_, err := ci.db.Exec(
-		"UPDATE `room_datas` SET `not_read` = 0, `latest_access` = CURRENT_TIMESTAMP WHERE `room_id` = ? AND `user_id` = ?",
+		"UPDATE room_datas SET not_read = 0, latest_access = CURRENT_TIMESTAMP WHERE room_id = $1 AND user_id = $2",
 		roomId,
 		userId,
 	)
 	return err
 }
 
-//not read message increment
 func (ci *chatInfra) IncrementNotRead(roomId string, userId string) error {
 	_, err := ci.db.Exec(
-		"UPDATE `room_datas` SET `not_read` = `not_read` + 1 WHERE `room_id` = ? AND `user_id` != ?",
+		"UPDATE room_datas SET not_read = not_read + 1 WHERE room_id = $1 AND user_id != $2",
 		roomId,
 		userId,
 	)
