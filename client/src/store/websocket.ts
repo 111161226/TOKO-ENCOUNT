@@ -13,7 +13,7 @@ interface EventData {
 }
 
 const isProduction = import.meta.env.PROD;
-const host = "toko-encount.onrender.com/";
+const host = import.meta.env.VITE_API_HOST;
 
 // 本番なら wss://、ローカルなら ws:// を自動選択
 const protocol = isProduction ? 'wss' : 'ws';
