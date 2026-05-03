@@ -18,7 +18,7 @@ func NewSessionInfra(db *sqlx.DB) repository.SessionRepository {
 	return &sessionInfra{db: db}
 }
 
-//create session
+// create session
 func (si *sessionInfra) CreateSession(userId string) (*model.Session, error) {
 	uu, err := uuid.NewRandom()
 	if err != nil {
@@ -28,7 +28,7 @@ func (si *sessionInfra) CreateSession(userId string) (*model.Session, error) {
 	uuidStr := uu.String()
 
 	_, err = si.db.Exec(
-		"INSERT INTO `sessions` (`session_id`, `user_id`) VALUES (?, ?)",
+		"INSERT INTO sessions (session_id, user_id) VALUES ($1, $2)",
 		uuidStr,
 		userId,
 	)
@@ -42,12 +42,12 @@ func (si *sessionInfra) CreateSession(userId string) (*model.Session, error) {
 	}, nil
 }
 
-//get seesion by session id
+// get session by session id
 func (si *sessionInfra) GetSession(sessionId string) (*model.Session, error) {
 	sess := model.Session{}
 	err := si.db.Get(
 		&sess,
-		"SELECT * FROM `sessions` WHERE `session_id` = ?",
+		"SELECT * FROM sessions WHERE session_id = $1",
 		sessionId,
 	)
 	if err != nil {
@@ -57,30 +57,30 @@ func (si *sessionInfra) GetSession(sessionId string) (*model.Session, error) {
 	return &sess, nil
 }
 
-//delete session by session id
+// delete session by session id
 func (si *sessionInfra) DeleteSessionBySessionId(sessionId string) error {
 	_, err := si.db.Exec(
-		"DELETE FROM `sessions` WHERE `session_id` = ?",
+		"DELETE FROM sessions WHERE session_id = $1",
 		sessionId,
 	)
 	return err
 }
 
-//delete session by user id
+// delete session by user id
 func (si *sessionInfra) DeleteSessionsByUserId(userId string) error {
 	_, err := si.db.Exec(
-		"DELETE FROM `sessions` WHERE `user_id` = ?",
+		"DELETE FROM sessions WHERE user_id = $1",
 		userId,
 	)
 	return err
 }
 
-//check session is present
+// check session is present
 func (si *sessionInfra) CheckSession(sessionId string) (*model.Session, error) {
 	sess := model.Session{}
 	err := si.db.Get(
 		&sess,
-		"SELECT * FROM `sessions` WHERE `session_id` = ?",
+		"SELECT * FROM sessions WHERE session_id = $1",
 		sessionId,
 	)
 	if err != nil {
